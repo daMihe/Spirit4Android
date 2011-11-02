@@ -1,0 +1,20 @@
+        ### ###  #  ###  #  ###       #      #  ### ##  ###  #   #  ##
+        #   # #  #  # #  #   #      # #     # # # # # # # # # #  #  # #
+        ### ###  #  ##   #   #      ###     ### # # # # ##  # #  #  # #
+          # #    #  # #  #   #        #     # # # # # # # # # #  #  # #
+        ### #    #  # #  #   #        #     # # # # ##  # #  #   #  ## 
+
+-------------------------------------------------------------------------------
+
+DE: Eine App um aktuelle Nachrichten, sowie einen Stundenplan für einen Stu-
+    iengang aktuell herunterzuladen und den Stundenplan als Countdown anzu-
+    zeigen.
+
+EN: An application for displaying news and a schedule for one course. It does
+    update news once a day automatically. The next course-event is displayed
+    as countdown.
+
+-------------------------------------------------------------------------------
+
+Ursprünglich entwickelt von/originally developed by: Michael Wodniok
+Basierend auf/Based on: Spirit-REST-Service

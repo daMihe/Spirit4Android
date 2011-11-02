@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:scrollbars="vertical" >
+
+    <LinearLayout
+        android:id="@+id/aboutLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon" />
+
+        <TextView
+            android:id="@+id/aboutTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center|center_vertical"
+            android:text="Spirit für Android"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/aboutVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/aboutText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Programmiert von Michael Wodniok.\nBugs und Anregungen an michiw32@gmail.com. Beschimpfungen und destruktive Kritik bitte an irgendwen anderes schicken.\n\nEntwicklung in Zusammenarbeit mit dem PaDS-Lab der FH Schmalkalden. Danke an Stefan Kunze (Alias: kunze) und Marcus Denison (Alias: fattrat) für die Entwicklung der REST-Schnittstelle und der Spirit-Plattform ohne die eine Android-App deutlich schwerer zu schreiben bzw. sogar unmöglich wäre.\n\nVerwendete Tools:\n- Eclipse\n- OpenJDK 7\n- Eclipse JDT\n- Eclipse ADT\n- Android SDK Rev. 14\n- Inkscape"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</LinearLayout>

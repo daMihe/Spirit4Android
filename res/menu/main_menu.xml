@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/update" android:title="News-Update starten" android:orderInCategory="0"></item>
+    <item android:id="@+id/settings" android:title="Stundenplan-Einstellungen" android:orderInCategory="2"></item>
+    <item android:id="@+id/about" android:title="Über Spirit4Android" android:orderInCategory="3"></item>
+    
+    
+    
+</menu>

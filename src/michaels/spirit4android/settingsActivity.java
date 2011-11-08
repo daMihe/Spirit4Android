@@ -77,6 +77,7 @@ public class settingsActivity extends Activity {
 					if(new JSONArray(response).length() != 0){
 						Editor e = mainActivity.saveFile.edit();
 						e.putString("scheduleJSON", response);
+						
 						e.commit();
 						pd.dismiss();
 						Toast.makeText(settingsActivity.this, "Stundenplan wurde aktualisiert.", Toast.LENGTH_LONG).show();

@@ -17,36 +17,32 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int about=0x7f07001d;
+        public static final int about=0x7f070019;
         public static final int aboutLayout=0x7f070000;
         public static final int aboutText=0x7f070004;
         public static final int aboutTitle=0x7f070002;
         public static final int aboutVersion=0x7f070003;
         public static final int countdown=0x7f07000b;
-        public static final int downloadPlanNow=0x7f070018;
-        public static final int fach=0x7f07000d;
+        public static final int downloadPlanNow=0x7f070015;
         public static final int groupDesc=0x7f070005;
-        public static final int groupFilters=0x7f07001a;
+        public static final int groupFilters=0x7f070016;
         public static final int groupInput=0x7f070006;
-        public static final int grpFilterDesc=0x7f070019;
+        public static final int grpFilterDesc=0x7f070014;
         public static final int imageView1=0x7f070001;
         public static final int layoutMitCountdown=0x7f070008;
-        public static final int linearLayout1=0x7f070009;
-        public static final int linearLayout2=0x7f07000c;
-        public static final int moreEvents=0x7f07000f;
-        public static final int newsDesc=0x7f070013;
-        public static final int newsDisp=0x7f070014;
-        public static final int newsListe=0x7f070011;
-        public static final int newsTitle=0x7f070012;
+        public static final int main_plan=0x7f070009;
+        public static final int main_plan_alternative=0x7f07000c;
+        public static final int newsDesc=0x7f070010;
+        public static final int newsDisp=0x7f070011;
+        public static final int newsListe=0x7f07000e;
+        public static final int newsTitle=0x7f07000f;
         public static final int nächstesEvent=0x7f07000a;
-        public static final int raum=0x7f07000e;
         public static final int saveGroup=0x7f070007;
-        public static final int settings=0x7f07001c;
-        public static final int settingsDesc=0x7f070015;
-        public static final int studiengangspinner=0x7f070017;
-        public static final int studiengangspinnerlayout=0x7f070016;
-        public static final int textView1=0x7f070010;
-        public static final int update=0x7f07001b;
+        public static final int settings=0x7f070018;
+        public static final int settingsDesc=0x7f070012;
+        public static final int studiengangspinner=0x7f070013;
+        public static final int textView1=0x7f07000d;
+        public static final int update=0x7f070017;
     }
     public static final class layout {
         public static final int about=0x7f030000;
@@ -60,7 +56,6 @@ public final class R {
         public static final int main_menu=0x7f060000;
     }
     public static final class string {
-        public static final int app_name=0x7f050001;
-        public static final int hello=0x7f050000;
+        public static final int app_name=0x7f050000;
     }
 }

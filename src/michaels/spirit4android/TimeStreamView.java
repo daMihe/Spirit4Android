@@ -72,7 +72,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 					jso.optString("titleShort")+" ("+jso.optString("eventType")+")";
 			g.drawText(toWrite, 0, end-p.descent(), p);
 			current.set(Calendar.DAY_OF_YEAR, day.get(Calendar.DAY_OF_YEAR));
-			if(current.before(Calendar.getInstance()) || current.before(day)){
+			if(current.before(Calendar.getInstance())){
 				Calendar endOfEvent = (Calendar) current.clone();
 				endOfEvent.add(Calendar.MINUTE, 90);
 				endOfEvent = (Calendar.getInstance().before(endOfEvent) ? 

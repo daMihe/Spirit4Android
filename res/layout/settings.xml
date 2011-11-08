@@ -1,42 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
-    <TextView android:layout_width="wrap_content" android:text="Für einen regulären Stundenplan ist die Angabe Deines Studienganges mit Semester notwendig:" android:id="@+id/settingsDesc" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium"></TextView>
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+    <TextView android:layout_width="wrap_content" 
+        android:text="Für einen regulären Stundenplan ist die Angabe Deines Studienganges mit Semester notwendig:" 
+        android:id="@+id/settingsDesc" 
+        android:layout_height="wrap_content" 
+        android:textAppearance="?android:attr/textAppearanceMedium"></TextView>
 
-    <LinearLayout
-        android:id="@+id/studiengangspinnerlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Spinner
-            android:id="@+id/studiengangspinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/downloadPlanNow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Stundenplan jetzt herunterladen" />
-
-    <TextView
-        android:id="@+id/grpFilterDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Für folgende Events stehen Gruppenfilter zur Verfügung (auswählen zum Setzen der Gruppe):"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+	<Spinner
+	    android:id="@+id/studiengangspinner"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBottom="@+id/grpFilterDesc"
+	    android:layout_centerHorizontal="true"
+	    android:layout_below="@+id/settingsDesc"
+	    android:layout_weight="1" />
+	
+	<Button
+	    android:id="@+id/downloadPlanNow"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/studiengangspinner"
+	    android:text="Stundenplan jetzt herunterladen" />
+	
+	<TextView
+	    android:id="@+id/grpFilterDesc"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/downloadPlanNow"
+	    android:text="Für folgende Events stehen Gruppenfilter zur Verfügung (auswählen zum Setzen der Gruppe):"
+	    android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ListView
         android:id="@+id/groupFilters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:scrollbars="vertical">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/grpFilterDesc"
+        android:scrollbars="vertical" >
+
     </ListView>
     
 </LinearLayout>
+
+
+
+

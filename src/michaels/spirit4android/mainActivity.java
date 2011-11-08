@@ -2,8 +2,6 @@ package michaels.spirit4android;
 
 import java.security.MessageDigest;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -35,20 +33,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class mainActivity extends Activity {
-	final static double VERSION = 0.2;
+	final static double VERSION = 0.3;
 	public static String USERAGENT;
 	public static SharedPreferences saveFile;
 	public static JSONObject newsObject = null;
 	public static String preJSON = "";
 	boolean stop;
 	boolean pause;
-	static schedule sch;
+	boolean showCompletePlan;
+	static FHSSchedule schedule;
+	static TimeStreamView tsv;
 	public void onCreate(Bundle b){
 		super.onCreate(b);
 		DisplayMetrics dm = new DisplayMetrics();
@@ -79,14 +80,18 @@ public class mainActivity extends Activity {
 			e.putInt("letzterSemesterWechsel", Calendar.getInstance().get(Calendar.MONTH));
 			e.commit();
 		}
-		try {
-			sch = new schedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")));
-		} catch (JSONException e1) {
-			e1.printStackTrace();
+		if(!saveFile.getString("scheduleJSON", "[]").equals("[]")){
+			try {
+				schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")),saveFile);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		//Oberfläche
 		this.setContentView(R.layout.main);
+		
 		final ListView newsListe = (ListView) this.findViewById(R.id.newsListe);
 		try {
 			final JSONArray newsJSON = new JSONArray(saveFile.getString("newsJSON", "[]"));
@@ -113,62 +118,56 @@ public class mainActivity extends Activity {
 			Log.e("Display Creation Error",e.getClass().getName()+": "+e.getMessage());
 		}
 		
-
 		Runnable r = new Runnable(){
 			
 			public void run() {
 				if(!pause){
-					TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
-					TextView fach = (TextView)mainActivity.this.findViewById(R.id.fach);
-					TextView raum = (TextView)mainActivity.this.findViewById(R.id.raum);
-					TextView nevent = (TextView)mainActivity.this.findViewById(R.id.nächstesEvent);
-					TextView mehrEvents = (TextView)mainActivity.this.findViewById(R.id.moreEvents);
-					if(sch.getNextCalendar() == null){
-						countdown.setText("");
-						countdown.setVisibility(View.GONE);
-						nevent.setText("z.Z. keine Stundenplan-Daten vorhanden. Lade deinen Plan über [Menü-Taste] > \"Stundenplan-Einstellungen\" herunter und stell dort auch deine Gruppen-Filter ein.");
-						fach.setText("");
-						fach.setVisibility(View.GONE);
-						raum.setText("");
-						raum.setVisibility(View.GONE);
-						mehrEvents.setText("");
-						mehrEvents.setVisibility(View.GONE);
+					if(schedule.length() == 0){
+						((LinearLayout)mainActivity.this.findViewById(R.id.main_plan)).setVisibility(View.VISIBLE);
+						((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.GONE);
+						((TextView)mainActivity.this.findViewById(R.id.countdown)).setVisibility(View.GONE);
+						((TextView)mainActivity.this.findViewById(R.id.nächstesEvent)).setText("z.Z. keine Stundenplan-Daten vorhanden. Lade deinen Plan über [Menü-Taste] > \"Stundenplan-Einstellungen\" herunter und stell dort auch deine Gruppen-Filter ein.");
 					} else {
-						long zeitDifferenz = sch.getNextCalendar().getTimeInMillis()- new GregorianCalendar().getTimeInMillis();
-						long stunden  = (zeitDifferenz / (3600*1000));
-						long minuten  = (zeitDifferenz / 60000) - (stunden * 60);
-						long sekunden = (zeitDifferenz / 1000) - (stunden*3600+minuten*60);
-						GregorianCalendar bzt = (GregorianCalendar) sch.getNextCalendar().clone();
-						bzt.set(Calendar.HOUR_OF_DAY, 0);
-						bzt.set(Calendar.MINUTE, 0);
-						long tage = (bzt.getTimeInMillis()-new GregorianCalendar().getTimeInMillis())/(24*60*60*1000) +1;
-						countdown.setText(stunden>23 ? "~ "+tage+" Tag"+(tage==1?"":"en")+" um "+DateFormat.getTimeInstance(DateFormat.SHORT).format(sch.getNextCalendar().getTime()) : String.format("%02d:%02d:%02d", stunden,minuten,sekunden));
-						countdown.setVisibility(View.VISIBLE);
-						JSONObject c = sch.getNextJSON();
-						nevent.setText("Nächstes Event ("+c.optString("eventType")+") in");
-						fach.setText(c.optString("titleShort"));
-						fach.setVisibility(View.VISIBLE);
-						raum.setText(c.optJSONObject("appointment").optJSONObject("location").optJSONObject("place").optString("building")+":"+c.optJSONObject("appointment").optJSONObject("location").optJSONObject("place").optString("room"));
-						raum.setVisibility(View.VISIBLE);
-						ArrayList<GregorianCalendar> moreEvList = new ArrayList<GregorianCalendar>();
-						GregorianCalendar gc = sch.getNextCalendar();
-						GregorianCalendar nextEventCalendar = gc;
-						while((gc = sch.getNextCalendar(gc)) != null && gc.get(Calendar.DAY_OF_MONTH) == nextEventCalendar.get(Calendar.DAY_OF_MONTH) && !gc.equals(nextEventCalendar))
-							moreEvList.add(gc);
-						if(moreEvList.isEmpty()){
-							mehrEvents.setVisibility(View.GONE);
-							mehrEvents.setText("");
-						} else {
-							String textToSet = "danach ";
-							for(int i = 0; i<moreEvList.size(); i++){
-								textToSet += sch.getNextJSON(i==0 ? nextEventCalendar : moreEvList.get(i-1)).optString("titleShort")+" um "+DateFormat.getTimeInstance(DateFormat.SHORT).format(moreEvList.get(i).getTime())+(i<moreEvList.size()-2 ? ", " : (i<moreEvList.size()-1 ? " und " : ""));
+						TextView nevent = (TextView)mainActivity.this.findViewById(R.id.nächstesEvent);
+						if(tsv == null || tsv.switchDayAutomatically){
+							TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
+							JSONObject c = schedule.getNextEvent();
+							Calendar nCalendar = schedule.getNextCalendar(c);
+							long zeitDifferenz = nCalendar.getTimeInMillis()- new GregorianCalendar().getTimeInMillis();
+							long stunden  = (zeitDifferenz / (3600*1000));
+							long minuten  = (zeitDifferenz / 60000) - (stunden * 60);
+							long sekunden = (zeitDifferenz / 1000) - (stunden*3600+minuten*60);
+							GregorianCalendar bzt = (GregorianCalendar) nCalendar.clone();
+							bzt.set(Calendar.HOUR_OF_DAY, 0);
+							bzt.set(Calendar.MINUTE, 0);
+							long tage = (bzt.getTimeInMillis()-new GregorianCalendar().getTimeInMillis())/(24*60*60*1000) +1;
+							countdown.setText(stunden>23 ? "~ "+tage+" Tag"+(tage==1?"":"en")+" um "+DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getNextCalendar(schedule.getNextEvent()).getTime()) : String.format("%02d:%02d:%02d", stunden,minuten,sekunden));
+							countdown.setVisibility(View.VISIBLE);
+							nevent.setText("Nächstes Event ("+c.optString("eventType")+") in");
+							if(tsv == null || tsv.schedule != schedule){
+								tsv = new TimeStreamView(mainActivity.this,schedule);
+								((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).removeAllViews();
+								((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).addView(tsv);
 							}
-							mehrEvents.setText(textToSet);
-							mehrEvents.setVisibility(View.VISIBLE);
+							nevent.setClickable(false);
+							nevent.setTextColor(0xffffffff);
+						} else {
+							((TextView)mainActivity.this.findViewById(R.id.countdown)).setVisibility(View.GONE);
+							nevent.setTextColor(0xffcccccc);
+							nevent.setText("Hier \"klicken\" um zurück zum Countdown zu kommen...");
+							nevent.setOnClickListener(new View.OnClickListener(){
+
+								public void onClick(View v) {
+									tsv.switchDayAutomatically = true;
+								}
+								
+							});
+							nevent.setClickable(true);
 						}
+						tsv.invalidate();
 					}
 				}
-				if(!mainActivity.this.stop && preJSON.equals(mainActivity.saveFile.getString("newsJSON", ""))){
+				if(!mainActivity.this.stop && preJSON.equals(mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", ""))){
 					Intent serv = new Intent(mainActivity.this,updater.class);
 					mainActivity.this.startService(serv);
 					Handler h = new Handler();
@@ -178,18 +177,18 @@ public class mainActivity extends Activity {
 					Intent restart = new Intent(mainActivity.this,mainActivity.class);
 					mainActivity.this.startActivity(restart);
 					mainActivity.this.finish();
-				} else {
+				} else if(!mainActivity.this.stop){
 					Handler h = new Handler();
 					h.removeCallbacks(this);
 					h.postDelayed(this, 500);
 				}
 					
 					
-				preJSON = mainActivity.saveFile.getString("newsJSON", "");
+				preJSON = mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", "");
 			}
 			
 		};
-		preJSON = mainActivity.saveFile.getString("newsJSON", "");
+		preJSON = mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", "");
 		Handler countdown = new Handler();
 		countdown.removeCallbacks(r);
 		countdown.post(r);
@@ -207,7 +206,12 @@ public class mainActivity extends Activity {
 	
 	public void onResume(){
 		try {
-			sch = new schedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")));
+			schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")),saveFile);
+			if(tsv != null){
+				((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).removeAllViews();
+				tsv = new TimeStreamView(mainActivity.this,schedule);
+				((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).addView(tsv);
+			}
 		} catch(Exception e){}
 		pause = false;
 		super.onResume();
@@ -256,7 +260,7 @@ public class mainActivity extends Activity {
 		return "";
 	}
 	
-	public class schedule{
+	/*public class schedule{
 		ArrayList<GregorianCalendar> events = new ArrayList<GregorianCalendar>();
 		ArrayList<Integer> eventIndexes = new ArrayList<Integer>();
 		JSONArray eventJSON;
@@ -306,6 +310,16 @@ public class mainActivity extends Activity {
 			}
 			return null;
 		}
+		
+		public GregorianCalendar getCurrentCalendar(){
+			for(GregorianCalendar gc:events){
+				//JSONObject jo = getNextJSON(gc);
+				//gc = ((GregorianCalendar)gc.clone()).add(Calendar.DAY_OF_MONTH, ());
+				//if(gc.before(new GregorianCalendar()) && new GregorianCalendar((GregorianCalendar)gc.clone())
+			}
+			return null;
+		}
+		
 		public GregorianCalendar getNextCalendar(){
 			return getNextCalendar(new GregorianCalendar());
 		}
@@ -318,7 +332,7 @@ public class mainActivity extends Activity {
 			}
 			return (nächster.get(GregorianCalendar.YEAR) == new GregorianCalendar().get(GregorianCalendar.YEAR) + 2 ? null : nächster);
 		}
-	}
+	}*/
 
 	public static class updater extends Service {
 		public int onStartCommand(Intent intent,int flags,int serviceID){
@@ -347,6 +361,7 @@ public class mainActivity extends Activity {
 				}
 				
 			}
+			this.stopSelf();
 			return Service.START_NOT_STICKY;
 		}
 		

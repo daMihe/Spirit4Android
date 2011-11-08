@@ -23,11 +23,11 @@ public final class R {
         public static final int aboutTitle=0x7f070002;
         public static final int aboutVersion=0x7f070003;
         public static final int countdown=0x7f07000b;
-        public static final int downloadPlanNow=0x7f070015;
+        public static final int downloadPlanNow=0x7f070014;
         public static final int groupDesc=0x7f070005;
         public static final int groupFilters=0x7f070016;
         public static final int groupInput=0x7f070006;
-        public static final int grpFilterDesc=0x7f070014;
+        public static final int grpFilterDesc=0x7f070015;
         public static final int imageView1=0x7f070001;
         public static final int layoutMitCountdown=0x7f070008;
         public static final int main_plan=0x7f070009;

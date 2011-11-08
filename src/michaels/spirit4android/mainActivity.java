@@ -129,7 +129,8 @@ public class mainActivity extends Activity {
 						((TextView)mainActivity.this.findViewById(R.id.nächstesEvent)).setText("z.Z. keine Stundenplan-Daten vorhanden. Lade deinen Plan über [Menü-Taste] > \"Stundenplan-Einstellungen\" herunter und stell dort auch deine Gruppen-Filter ein.");
 					} else {
 						TextView nevent = (TextView)mainActivity.this.findViewById(R.id.nächstesEvent);
-						if(tsv == null || tsv.switchDayAutomatically){
+						((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.VISIBLE);
+						if(tsv == null || tsv.switchDayAutomatically){							
 							TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
 							JSONObject c = schedule.getNextEvent();
 							Calendar nCalendar = schedule.getNextCalendar(c);
@@ -207,11 +208,6 @@ public class mainActivity extends Activity {
 	public void onResume(){
 		try {
 			schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")),saveFile);
-			if(tsv != null){
-				((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).removeAllViews();
-				tsv = new TimeStreamView(mainActivity.this,schedule);
-				((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).addView(tsv);
-			}
 		} catch(Exception e){}
 		pause = false;
 		super.onResume();

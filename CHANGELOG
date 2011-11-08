@@ -1,0 +1,7 @@
+Changelog for Spirit4Android
+
+Version 0.3
+- written new schedule-parser, now currently running events are displayed too
+- changed countdown and schedule view. Now all events at the next day are 
+  visible and it's now possible to browse the schedule.
+- changed icon 

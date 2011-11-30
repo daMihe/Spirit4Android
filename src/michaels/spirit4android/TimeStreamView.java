@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -120,18 +119,15 @@ public class TimeStreamView extends View implements OnTouchListener{
 							format(dayAfterCalendar.getTime()));
 			Rect mr = new Rect();
 			p.setTextSize(this.touchMove-this.touchDown > this.getWidth()/3 ? 40 : 30);
-			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
 			p.getTextBounds(dayBefore, 0, dayBefore.length(), mr);
 			g.drawText(dayBefore, (this.touchMove-this.touchDown)-mr.width()/2, this.getHeight()/2+
 					mr.height()/2, p);
 			p.setTextSize(this.touchMove-this.touchDown < this.getWidth()/3 &&
 					this.touchDown-this.touchMove < this.getWidth()/3? 45 : 35);
-			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
 			p.getTextBounds(dayCurrent, 0, dayCurrent.length(), mr);
 			g.drawText(dayCurrent, (this.touchMove-this.touchDown)+(this.getWidth()/2)-mr.width()/2, 
 					this.getHeight()/2+mr.height()/2, p);
 			p.setTextSize(this.touchDown-this.touchMove > this.getWidth()/3 ? 45 : 35);
-			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
 			p.getTextBounds(dayAfter, 0, dayAfter.length(), mr);
 			g.drawText(dayAfter, (this.touchMove-this.touchDown)+(this.getWidth())-mr.width()/2, 
 					this.getHeight()/2+mr.height()/2, p);

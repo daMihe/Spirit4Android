@@ -2,7 +2,6 @@ package michaels.spirit4android;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -12,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class FHSSchedule {
 	// Stundenplan in Dreidimensionales Array, [WOCHE%2(=gerade/ungerade)][Tag][Slot(=Stundenbereich)]
@@ -108,9 +106,7 @@ public class FHSSchedule {
 		return comingEvents.toArray(new JSONObject[0]);
 		
 	}
-	public JSONObject getNextEvent(){
-		Calendar actualTime = Calendar.getInstance();
-		
+	public JSONObject getNextEvent(Calendar actualTime){
 		JSONObject rtn = null;
 		if(getDaysComingEvents(Calendar.getInstance()).length != 0){
 			rtn = getDaysComingEvents(Calendar.getInstance())[0];
@@ -125,6 +121,10 @@ public class FHSSchedule {
 			}
 		}
 		return rtn;
+	}
+	
+	public JSONObject getNextEvent(){
+		return getNextEvent(Calendar.getInstance());
 	}
 	
 	public JSONObject getNextEventIncludingCurrent(){

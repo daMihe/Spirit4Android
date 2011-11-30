@@ -22,6 +22,8 @@ public class TimeStreamView extends View implements OnTouchListener{
 	Calendar day;
 	boolean showChangeDay = false;
 	boolean switchDayAutomatically = true;
+	float touchDown = -1;
+	float touchMove = -1;
 	public TimeStreamView(Context context,FHSSchedule schedule) {
 		super(context);
 		this.context = context;
@@ -102,30 +104,37 @@ public class TimeStreamView extends View implements OnTouchListener{
 			p.setColor(0xccffffff);
 			g.drawRect(0, 0, this.getWidth(), this.getHeight(), p);
 			p.setColor(0xff000000);
-			p.setStyle(Paint.Style.STROKE);
-			g.drawRect(0, 0, this.getWidth()/5, this.getHeight(), p);
-			g.drawRect(this.getWidth()*(4f/5f), 0, this.getWidth(), this.getHeight(), p);
-			p.setStyle(Paint.Style.FILL);
-			p.setTextSize(40);
-			String text = (day.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().
-						get(Calendar.DAY_OF_YEAR) ?
-					"heute":DateFormat.getDateInstance(DateFormat.SHORT).format(day.getTime()));
-			Rect rC = new Rect();
-			p.getTextBounds(text, 0, text.length(), rC);
-			g.drawText(text, this.getWidth()/2-rC.width()/2, this.getHeight()/2+rC.height()/2, p);
-			
-			float size = (this.getWidth()/5 > this.getHeight() ? this.getHeight() : this.getWidth()/5)
-					*0.8f;
-			float w = this.getWidth();
-			float h = this.getHeight();
-			g.drawLines(new float[]{
-					w/10+size/4, h/2-size/2, w/10+size/4, h/2+size/2, //Linkes Oben>Unten
-					w/10+size/4, h/2+size/2, w/10-size/4, h/2, //Linkes Unten>Mitte
-					w/10-size/4, h/2, w/10+size/4, h/2-size/2, //Linkes Mitte>Oben
-					w*9/10-size/4, h/2-size/2, w*9/10-size/4, h/2+size/2, //Rectes Oben>Unten
-					w*9/10-size/4, h/2+size/2, w*9/10+size/4, h/2, //Rechtes Unten>Mitte
-					w*9/10+size/4, h/2, w*9/10-size/4, h/2-size/2 //Rechtes Mitte>Oben
-			}, p);
+			p.setTextSize(35);
+			Calendar dayBeforeCalendar = (Calendar) day.clone();
+			dayBeforeCalendar.add(Calendar.DAY_OF_YEAR, -1);
+			Calendar dayAfterCalendar = (Calendar) day.clone();
+			dayAfterCalendar.add(Calendar.DAY_OF_YEAR, 1);
+			String dayBefore = (dayBeforeCalendar.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().
+					get(Calendar.DAY_OF_YEAR) ? "heute" : DateFormat.getDateInstance(DateFormat.SHORT).
+							format(dayBeforeCalendar.getTime()));
+			String dayCurrent = (day.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().
+					get(Calendar.DAY_OF_YEAR) ? "heute" : DateFormat.getDateInstance(DateFormat.SHORT).
+							format(day.getTime()));
+			String dayAfter = (dayAfterCalendar.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().
+					get(Calendar.DAY_OF_YEAR) ? "heute" : DateFormat.getDateInstance(DateFormat.SHORT).
+							format(dayAfterCalendar.getTime()));
+			Rect mr = new Rect();
+			p.setTextSize(this.touchMove-this.touchDown > this.getWidth()/3 ? 40 : 30);
+			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
+			p.getTextBounds(dayBefore, 0, dayBefore.length(), mr);
+			g.drawText(dayBefore, (this.touchMove-this.touchDown)-mr.width()/2, this.getHeight()/2+
+					mr.height()/2, p);
+			p.setTextSize(this.touchMove-this.touchDown < this.getWidth()/3 &&
+					this.touchDown-this.touchMove < this.getWidth()/3? 45 : 35);
+			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
+			p.getTextBounds(dayCurrent, 0, dayCurrent.length(), mr);
+			g.drawText(dayCurrent, (this.touchMove-this.touchDown)+(this.getWidth()/2)-mr.width()/2, 
+					this.getHeight()/2+mr.height()/2, p);
+			p.setTextSize(this.touchDown-this.touchMove > this.getWidth()/3 ? 45 : 35);
+			p.setColor(p.getTextSize() == 35 ? 0xff888888 : 0xff000000);
+			p.getTextBounds(dayAfter, 0, dayAfter.length(), mr);
+			g.drawText(dayAfter, (this.touchMove-this.touchDown)+(this.getWidth())-mr.width()/2, 
+					this.getHeight()/2+mr.height()/2, p);
 		}		
 	}
 	
@@ -137,7 +146,9 @@ public class TimeStreamView extends View implements OnTouchListener{
 		day = (day == null ? schedule.getNextCalendar(schedule.getNextEventIncludingCurrent()) : day);
 		JSONObject[] objects = schedule.getEventsAtDay(day);
 		
-		String longestString = "";
+		String longestString = DateFormat.getDateInstance(DateFormat.LONG).format(day.getTime());
+		longestString = (longestString.length() < "keine Veranstaltung".length() ? 
+				"keine Veranstaltung" : longestString);
 		int widthOfLongest = 0;
 		short count = 0;
 		for(JSONObject currentEvent:objects){
@@ -171,24 +182,28 @@ public class TimeStreamView extends View implements OnTouchListener{
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
-		if(event.getAction() == MotionEvent.ACTION_DOWN && event.getX() < this.getWidth()*(3/5f) &&
-				event.getX() > this.getWidth()*(2/5f)){
+		if(event.getAction() == MotionEvent.ACTION_DOWN){
 			this.showChangeDay = true;
+			this.touchDown = this.touchMove = event.getX();
 			this.invalidate();
 			return true;
 		} else if(event.getAction() == MotionEvent.ACTION_UP) {
-			if(event.getX() < this.getWidth()/5){
+			if(event.getX() > this.touchDown+this.getWidth()/3){
 				this.switchDayAutomatically = false;
 				day.add(Calendar.DAY_OF_YEAR, -1);
 				this.requestLayout();
 				this.invalidate();
-			} else if(event.getX() > this.getWidth()*4/5) {
+			} else if(event.getX() < this.touchDown-this.getWidth()/3) {
 				this.switchDayAutomatically = false;
 				day.add(Calendar.DAY_OF_YEAR, 1);
 				this.requestLayout();
 				this.invalidate();
 			}
 			this.showChangeDay = false;
+			this.invalidate();
+			return true;
+		} else if(event.getAction() == MotionEvent.ACTION_MOVE){
+			this.touchMove = event.getX();
 			this.invalidate();
 			return true;
 		}

@@ -1,5 +1,10 @@
 Changelog for Spirit4Android
 
+Version 0.4
+- Long black-screen at launch (appears only if there is no internet connection
+  or spirit is offline) removed
+- Update will be tried now only  once a day.
+
 Version 0.3
 - written new schedule-parser, now currently running events are displayed too
 - changed countdown and schedule view. Now all events at the next day are 

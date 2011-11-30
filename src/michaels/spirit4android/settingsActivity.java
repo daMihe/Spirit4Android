@@ -70,7 +70,7 @@ public class settingsActivity extends Activity {
 				pd.setCancelable(true);
 				pd.show();
 				try {
-					HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/schedule?classname="+mainActivity.saveFile.getString("semester", "bai1"));
+					HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/1.0/schedule?classname="+mainActivity.saveFile.getString("semester", "bai1"));
 					hg.setHeader("User-Agent", mainActivity.USERAGENT);
 					HttpResponse r = client.execute(hg);
 					String response = EntityUtils.toString(r.getEntity());

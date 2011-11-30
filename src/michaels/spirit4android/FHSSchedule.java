@@ -165,6 +165,7 @@ public class FHSSchedule {
 						current.set(Calendar.HOUR_OF_DAY, slots[slot][0]);
 						current.set(Calendar.MINUTE, slots[slot][1]);
 						current.set(Calendar.SECOND, 0);
+						current.set(Calendar.MILLISECOND, 0);
 						
 						current.add(Calendar.DAY_OF_MONTH, day+1-current.get(Calendar.DAY_OF_WEEK));
 						

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spirit</string>
+    <string name="LANG_NOSOUNDSFOUND">Keine Sounds auf der SD-Karte gefunden</string>
+    <string name="LANG_RANDOMSOUND">Zufällige Sound-Datei</string>
+    <string name="LANG_EVENTREMINDING">Event-Erinnerung</string>
+    <string name="LANG_SPIRITFORANDROID">Spirit für Android</string>
+    <string name="LANG_ABOUTTEXT">Programmiert von Michael Wodniok.\nBugs und Anregungen an michix5d@gmail.com. Beschimpfungen und destruktive Kritik bitte an irgendwen anderes schicken.\n\nEntwicklung in Zusammenarbeit mit dem PaDS-Lab der FH Schmalkalden. Danke an Stefan Kunze (Alias: kunze) und Marcus Denison (Alias: fattrat) für die Entwicklung der REST-Schnittstelle und der Spirit-Plattform ohne die eine Android-App deutlich schwerer zu schreiben bzw. sogar unmöglich wäre. Vielen Dank auch an Lynus Apel, Michael Dragunski, Philip Ekert und Siegmund Wodniok für Alltagstests (im Normalen Gebrauch).\n\nVerwendete Tools:\n- Eclipse\n- OpenJDK 7\n- Eclipse JDT\n- Eclipse ADT\n- Android SDK Rev. 14\n- Inkscape</string>
+	<string name="LANG_SAVE">Speichern</string>
+	<string name="LANG_NEWS">Nachrichten:</string>
+	<string name="LANG_SETTINGSCLASSDESCRIPTION">Für einen regulären Stundenplan ist die Angabe Deines Studienganges mit Semester notwendig:</string>
+	<string name="LANG_DOWNLOADSCHEDULENOW">Stundenplan jetzt herunterladen</string>
+	<string name="LANG_SELECTEVENTTOSETGROUP">Für folgende Events stehen Gruppenfilter zur Verfügung (auswählen zum Setzen der Gruppe):</string>
+	<string name="LANG_STOPALARM">Wecker ausschalten:</string>
+	<string name="LANG_TODAY">heute</string>
+	<string name="LANG_YESTERDAY">gestern</string>
+	<string name="LANG_TOMORROW">morgen</string>
+	<string name="LANG_ON_DAY">am</string>
+	<string name="LANG_PENETRANTMODE">Penetranter Modus</string>
+	<string name="LANG_WARNING">Warnung!</string>
+	<string name="LANG_PENETRANTMODEWARNING">Der "Penetrante Modus" ist aktiviert. Dabei lässt sich der Wecker nur durch das lösen einer sehr einfachen mathematischen Aufgabe oder durch das "killen" der App beenden. Außerdem lässt sich die Lautstärke der Musik nicht während dem Wecken variieren.\nEben richtig penetrant :D</string>
+	<string name="LANG_OK">OK</string>
+</resources>

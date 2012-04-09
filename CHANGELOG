@@ -1,5 +1,17 @@
 Changelog for Spirit4Android
 
+Planned for future (priority from top to bottom)
+- Speed-Up the app (there seems to be many pontential to tune up the app)
+- Add News-Filter
+- Add Spare-Time
+- Multi-Language the app (as far as possible)
+
+Version 0.5
+- Implemented a Alarm-Clock with penetrant mode (optional)
+- Added Build-Numbers
+- Language-dependent strings are now located as Android-ressources (currently
+  only a small part)
+
 Version 0.4
 - Long black-screen at launch (appears only if there is no internet connection
   or spirit is offline) removed

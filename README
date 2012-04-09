@@ -1,20 +1,26 @@
-        ### ###  #  ###  #  ###       #      #  ### ##  ###  #   #  ##
-        #   # #  #  # #  #   #      # #     # # # # # # # # # #  #  # #
-        ### ###  #  ##   #   #      ###     ### # # # # ##  # #  #  # #
-          # #    #  # #  #   #        #     # # # # # # # # # #  #  # #
-        ### #    #  # #  #   #        #     # # # # ##  # #  #   #  ## 
+ ███       █      █ █        ██                █           █            █    █
+█   █               █       █                 █ █          █                 █
+█     ███  █ █ ██ █ ███    ████  ███  █ ██   █   █ ███   ███ █ ██  ███  █  ███
+ ███  █  █ █ ██   █ █       █   █   █ ██     █████ █  █ █  █ ██   █   █ █ █  █
+    █ █  █ █ █    █ █       █   █   █ █      █   █ █  █ █  █ █    █   █ █ █  █
+█   █ ███  █ █    █ █       █   █   █ █      █   █ █  █ █  █ █    █   █ █ █  █
+ ███  █    █ █    █  ███    █    ███  █      █   █ █  █  ███ █     ███  █  ███
+      █
+      █              For Android Devices based on System Version 2.2 or higher
 
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 DE: Eine App um aktuelle Nachrichten, sowie einen Stundenplan für einen Stu-
     iengang aktuell herunterzuladen und den Stundenplan als Countdown anzu-
-    zeigen.
+    zeigen. Inzwischen ist auch ein Wecker hinzugekommen. Für mehr 
+    Informationen zu den Feautures bitte den CHANGELOG lesen.
 
 EN: An application for displaying news and a schedule for one course. It does
     update news once a day automatically. The next course-event is displayed
-    as countdown.
+    as countdown. In between, an alarm is feauture, too. For more information
+    about the feautures please read the CHANGELOG.
 
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 Ursprünglich entwickelt von/originally developed by: Michael Wodniok
 Basierend auf/Based on: Spirit-REST-Service

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="studiengang">
+        <item>bai1</item>
+        <item >bai2</item>
+        <item >bai3</item>
+        <item >bai4</item>
+        <item>bai5</item>
+        <item>bai6</item>
+        <item>bawi1</item>
+        <item>bawi2</item>
+        <item>bawi3</item>
+        <item>bawi4</item>
+        <item>bawi5</item>
+        <item>bawi6</item>
+        <item>bamm1</item>
+        <item>bamm2</item>
+        <item>bamm3</item>
+        <item>bamm4</item>
+        <item>bamm5</item>
+        <item>bamm6</item>
+        <item>bais1</item>
+        <item>bais2</item>
+        <item>bais3</item>
+        <item>bais4</item>
+        <item>bais5</item>
+        <item>bais6</item>
+        <item>mai1</item>
+        <item>mai2</item>
+        <item>mai3</item>
+        <item>mai4</item>
+    </string-array>
+    
+</resources>

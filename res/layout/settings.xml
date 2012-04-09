@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+  	<LinearLayout
+  	    android:layout_width="match_parent"
+  	    android:layout_height="wrap_content"
+  	    android:orientation="vertical" >
+
+	    <TextView android:layout_width="wrap_content"
+	        android:text="@string/LANG_SETTINGSCLASSDESCRIPTION" 
+	        android:id="@+id/settingsDesc" 
+	        android:layout_height="wrap_content" 
+	        android:textAppearance="?android:attr/textAppearanceMedium"></TextView>
+	
+		<Spinner
+		    android:id="@+id/studiengangspinner"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"></Spinner>
+		
+		<Button
+		    android:id="@+id/downloadPlanNow"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/LANG_DOWNLOADSCHEDULENOW"></Button>
+		
+		<TextView
+		    android:id="@+id/grpFilterDesc"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/LANG_SELECTEVENTTOSETGROUP"
+		    android:textAppearance="?android:attr/textAppearanceMedium"></TextView>
+	
+		<LinearLayout
+		    android:id="@+id/groupFilters"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical">
+
+		</LinearLayout>
+	
+		<Button
+		    android:id="@+id/alarmActivated"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" />
+	
+		<Spinner
+		    android:id="@+id/alarmMedia"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"></Spinner>
+
+		<ToggleButton
+		    android:id="@+id/alarmPenetrant"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:textOn="@string/LANG_PENETRANTMODE"
+		    android:textOff="@string/LANG_PENETRANTMODE" />
+
+    </LinearLayout>
+</ScrollView>
+
+
+
+

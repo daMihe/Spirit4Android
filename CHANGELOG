@@ -6,6 +6,21 @@ Planned for future (priority from top to bottom)
 - Add Spare-Time
 - Multi-Language the app (as far as possible)
 
+Version 0.6 (not yet released, but working on it) State from 2012-Apr-20 01:49
+- Bug fixed: When selecting a song for alarm, the selection was changed when the
+  settings were opened again.
+- System changed: News are now saved in a database. This is faster and allows to
+  create a news-filter.
+- Feature added: News-filter added (filter will be the same like the schedule-
+  semester)
+- UI changed: News are now sorted by creation-date.
+- UI changed: The main-screen does now show countdown and news even in landscape
+  mode on small screens.
+- UI changed: The song for alarm can only be changed if alarm is activated.
+- System changed: More or less the complete app is ready for i18n (most of used
+  texts are now located in the android-resources, which allows multi-languaged
+  apps)
+
 Version 0.5
 - Implemented a Alarm-Clock with penetrant mode (optional)
 - Added Build-Numbers

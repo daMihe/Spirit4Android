@@ -202,9 +202,10 @@ public class settingsActivity extends Activity {
 		} else
 			music.add(getString(R.string.LANG_NOSOUNDSFOUND));
 		ArrayAdapter<String> alarm_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,music);
-		alarm_spinner.setEnabled(alarm_cursor != null);
+		alarm_spinner.setEnabled(alarm_cursor != null && alarm_cursor.getCount() > 0);
 		alarm_spinner.setAdapter(alarm_spinner_adapter);
-		alarm_spinner.setSelection(current);
+		if(current != 0)
+			alarm_spinner.setSelection(current+1);
 		alarm_spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
 
 			public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long arg3) {

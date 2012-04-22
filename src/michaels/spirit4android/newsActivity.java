@@ -5,32 +5,38 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONException;
-
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.widget.TextView;
 
 public class newsActivity extends Activity {
+	
+	public static int id;
+	
 	public void onCreate(Bundle b){
 		super.onCreate(b);
 		this.setContentView(R.layout.news);
-		try {
+		Cursor c = mainActivity.database.rawQuery("SELECT * FROM news WHERE id = "+id,null);
+		if(c.getCount() != 0){
+			c.moveToFirst();
+			// Title
 			TextView newsTitle = (TextView) this.findViewById(R.id.newsTitle);
-			newsTitle.setText(mainActivity.newsObject.getString("subject"));
+			newsTitle.setText(c.getString(c.getColumnIndex("title")));
+			// written by <author> at Receivers
 			TextView newsDesc = (TextView) this.findViewById(R.id.newsDesc);
 			String who = "";
-			String[] befWho = mainActivity.newsObject.getString("semester").split(" ");
+			String[] befWho = c.getString(c.getColumnIndex("receivers")).split(" ");
 			for(String bw:befWho)
 				who += " "+(bw.equals("") ? "" : (bw.equals("semester") ? "Alle" : bw))+",";
 			if(who.length() != 0)
 				who = who.substring(0, who.length()-1);
-			newsDesc.setText("geschrieben von "+mainActivity.newsObject.getString("writer")+" am "+DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date.parse(mainActivity.newsObject.getString("date")))+" an"+who);
+			newsDesc.setText("geschrieben von "+c.getString(c.getColumnIndex("author"))+" am "+DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(c.getLong(c.getColumnIndex("date"))))+" an"+who);
 			WebView newsDisp = (WebView) this.findViewById(R.id.newsDisp);
 			newsDisp.setBackgroundColor(android.R.color.black);
 			String html = "";
-			String[] preHTML = mainActivity.newsObject.getString("news").split("%\\{");
+			String[] preHTML = c.getString(c.getColumnIndex("content")).split("%\\{");
 			for(String s:preHTML){
 				html += (s.indexOf("%")!=-1 ? "<span style=\""+s.replaceAll("\\}", "\">").replaceAll("%", "</span>") : s).replaceAll("\\r\\n","<br />");
 			}
@@ -48,12 +54,10 @@ public class newsActivity extends Activity {
 				html = html.replaceFirst("[\\*]{2}", "<strong>");
 				html = html.replaceFirst("[\\*]{2}", "</strong>");
 			}
+			html = html.replace("\\r\\n", "<br />");
 			html = "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body style=\"color:#fff\">"+html+"</body></html>";
 			newsDisp.loadData(html, "text/html", "UTF-8");
-
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
-		
+		c.close();		
 	}
 }

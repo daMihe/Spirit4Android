@@ -20,4 +20,17 @@
 	<string name="LANG_WARNING">Warnung!</string>
 	<string name="LANG_PENETRANTMODEWARNING">Der "Penetrante Modus" ist aktiviert. Dabei lässt sich der Wecker nur durch das lösen einer sehr einfachen mathematischen Aufgabe oder durch das "killen" der App beenden. Außerdem lässt sich die Lautstärke der Musik nicht während dem Wecken variieren.\nEben richtig penetrant :D</string>
 	<string name="LANG_OK">OK</string>
+	<string name="LANG_SEMESTERCHANGE">Semesterwechsel</string>
+	<string name="LANG_SEMESTERCHANGELONG">Es sieht so aus, als würde ein neues Semester anfangen. Passe also die Einstellungen an, damit dein Stundenplan auch weiterhin stimmt.</string>
+	<string name="LANG_SCHEDULESETTINGS">Stundenplan-Einstellungen</string>
+	<string name="LANG_UPDATING">Update läuft&#8230;</string>
+	<string name="LANG_LASTSUCCESSFULLUPDATE">Letztes Mal erfolgreich: </string>
+	<string name="LANG_NEVER">Nie</string>
+	<string name="LANG_NOSCHEDULELOADED">z.Z. keine Stundenplan-Daten vorhanden. Lade deinen Plan über [Menü-Taste] > "Stundenplan-Einstellungen" herunter und stell dort auch deine Gruppen-Filter ein.</string>
+	<string name="LANG_COUNTDOWNDAYS">~ %1$d Tagen um %2$s</string>
+	<string name="LANG_COUNTDOWNDAY">~ %1$d Tag um %2$s</string>
+	<string name="LANG_NEXTEVENTIN">Nächstes Event (%s) in</string>
+	<string name="LANG_CLICKTOGETBACK">Hier "klicken" um zurück zum Countdown zu kommen&#8230;</string>
+	<string name="REST_ET_LECTURE">Vorlesung</string>
+	<string name="REST_ET_EXERCISE">Uebung</string>
 </resources>

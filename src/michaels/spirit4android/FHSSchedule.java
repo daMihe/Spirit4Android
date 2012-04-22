@@ -24,7 +24,12 @@ public class FHSSchedule {
 			{16,0}, //16:00-17:30
 			{17,45},//17:45-19:15
 			{19,30} //19:30-21:00
-		}; 
+		};
+	
+	public enum EVENT_TYPES {
+		EVENT_LECTURE,
+		EVENT_EXERCISE
+	};
 	
 	final String[] dayNames = new String[]{
 			"Sonntag",

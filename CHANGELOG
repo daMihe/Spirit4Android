@@ -1,8 +1,6 @@
 Changelog for Spirit4Android
 
 Planned for future (priority from top to bottom)
-- Speed-Up the app (there seems to be many pontential to tune up the app)
-- Add News-Filter
 - Add Spare-Time
 - Multi-Language the app (as far as possible)
 
@@ -20,8 +18,10 @@ Version 0.6 (not yet released, but working on it) State from 2012-Apr-20 07:10
 - System changed: More or less the complete app is ready for i18n (most of used
   texts are now located in the android-resources, which allows multi-languaged
   apps)
-- Found Bug: Alarm does not ring, if app is used between 0:00 o clock and first
-  event on the same day.
+- Fixed Bug: Alarm does not ring, if app is used between 0:00 and first event on
+  the same day.
+- System changed: Schedule and Groups are now saved in the database, too. This
+  should improve the speed of the app dramatically, even on slow phones.
 
 Version 0.5
 - Implemented a Alarm-Clock with penetrant mode (optional)

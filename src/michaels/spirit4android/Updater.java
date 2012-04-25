@@ -1,6 +1,7 @@
 package michaels.spirit4android;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -35,7 +36,7 @@ public class Updater implements Runnable {
 						if(db != null){
 							try {
 								JSONArray news = new JSONArray(responseText);
-								SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss");
+								SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss Z",Locale.ENGLISH);
 								for(int i=0; i<news.length(); i++){
 									JSONObject current = news.optJSONObject(i);
 									Cursor c = db.rawQuery("SELECT * FROM news WHERE id = "+current.optString("nr"),null);

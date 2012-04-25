@@ -11,7 +11,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
 import android.text.method.DigitsKeyListener;
@@ -46,6 +46,7 @@ public class settingsActivity extends Activity {
 	HashMap<String,Integer> groups = new HashMap<String,Integer>();
 	DefaultHttpClient client = new DefaultHttpClient();
 	Cursor alarm_cursor;
+	ProgressDialog pd;
 	
 	public void onCreate(Bundle b){
 		super.onCreate(b);
@@ -76,30 +77,11 @@ public class settingsActivity extends Activity {
 		updateNow.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View arg0) {
-				ProgressDialog pd = new ProgressDialog(settingsActivity.this);
-				pd.setMessage("Bitte Warten, Stundenplan wird heruntergeladen...");
+				pd = new ProgressDialog(settingsActivity.this);
+				pd.setMessage(getString(R.string.LANG_DOWNLOADING));
 				pd.setCancelable(true);
 				pd.show();
-				try {
-					HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/1.0/schedule?classname="+mainActivity.saveFile.getString("semester", "bai1"));
-					hg.setHeader("User-Agent", mainActivity.USERAGENT);
-					HttpResponse r = client.execute(hg);
-					String response = EntityUtils.toString(r.getEntity());
-					if(new JSONArray(response).length() != 0){
-						Editor e = mainActivity.saveFile.edit();
-						e.putString("scheduleJSON", response);
-						
-						e.commit();
-						pd.dismiss();
-						Toast.makeText(settingsActivity.this, "Stundenplan wurde aktualisiert.", Toast.LENGTH_LONG).show();
-						try {
-							analyseScheduleForGroups();
-						} catch(Exception e1){}
-					}
-				} catch (Exception e) {
-					pd.dismiss();
-					Toast.makeText(settingsActivity.this, "Es gab einen Fehler beim Herunterladen.\n\n"+e.getClass().getName()+": "+e.getMessage(), Toast.LENGTH_LONG).show();
-				}
+				new Handler().postDelayed(new ScheduleLoader(), 500);
 			}
 			
 		});
@@ -235,17 +217,21 @@ public class settingsActivity extends Activity {
 	public void analyseScheduleForGroups() throws JSONException{
 		groups.clear();
 		ArrayList<String> array4list = new ArrayList<String>();
-		JSONArray stunden = new JSONArray(mainActivity.saveFile.getString("scheduleJSON", "[]"));
-		for(int i = 0; i<stunden.length(); i++){
-			JSONObject current = stunden.getJSONObject(i);
-			if(current.optString("group").replaceAll("[^0-9]*", "").length() != 0){
-				if(!groups.containsKey(current.optString("eventType")+"/"+current.optString("titleShort")) || groups.get(current.optString("eventType")+"/"+current.optString("titleShort")) < Integer.parseInt(current.optString("group").replaceAll("[^0-9]*", ""))){
-					groups.put(current.optString("eventType")+"/"+current.optString("titleShort"), Integer.parseInt(current.optString("group").replaceAll("[^0-9]*", "")));
-					if(!array4list.contains(current.optString("eventType")+"/"+current.optString("titleShort")))
-						array4list.add(current.optString("eventType")+"/"+current.optString("titleShort"));
-				}
+		
+		Cursor c = mainActivity.database.rawQuery("SELECT egroup, type, title FROM schedule",null);
+		c.moveToFirst();
+		while(!c.isAfterLast()){
+			if(c.getInt(c.getColumnIndex("egroup"))!= 0){
+				String index = getString(c.getInt(c.getColumnIndex("type")) == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+"/"+
+						c.getString(c.getColumnIndex("title"));
+				if(!groups.containsKey(index) || groups.get(index) < c.getInt(c.getColumnIndex("egroup")))
+					groups.put(index, c.getInt(c.getColumnIndex("egroup")));
+				if(!array4list.contains(index))
+					array4list.add(index);
 			}
+			c.moveToNext();
 		}
+		c.close();
 		if(array4list.size() != 0){
 			this.findViewById(R.id.grpFilterDesc).setVisibility(View.VISIBLE);
 			LinearLayout pseudo_list = (LinearLayout) this.findViewById(R.id.groupFilters);
@@ -257,7 +243,7 @@ public class settingsActivity extends Activity {
 				curtv.setOnClickListener(new OnClickListener() {
 					
 					public void onClick(View v) {
-						final TextView curtv = (TextView) v; 
+						TextView curtv = (TextView) v; 
 						final Dialog d = new Dialog(settingsActivity.this);
 						d.setContentView(R.layout.groupdialog);
 						d.setTitle("Gruppe ändern");
@@ -265,15 +251,22 @@ public class settingsActivity extends Activity {
 						final TextView tv = (TextView) d.findViewById(R.id.groupDesc);
 						final Button ok = (Button) d.findViewById(R.id.saveGroup);
 						final int maxValue = settingsActivity.this.groups.get(curtv.getText());
+						final String[] grp_str = curtv.getText().toString().split("/");
 						tv.setText("Gib eine Gruppennummer [min. 0 (= Event deaktiviert), max. "+maxValue+"] für "+curtv.getText()+" ein:");
-						et.setText(	mainActivity.saveFile.getInt("group"+mainActivity.MD5((String) curtv.getText()), 0)+"");
+						final byte type = (grp_str.equals(getString(R.string.LANG_LECTURE)) ? FHSSchedule.EVENT_LECTURE : FHSSchedule.EVENT_EXERCISE);
+						Cursor c = mainActivity.database.rawQuery("SELECT egroup FROM groups WHERE type = "+type+" AND title = '"+grp_str[1]+"'", null);
+						final boolean create = c.moveToFirst();
+						et.setText(create ? c.getInt(c.getColumnIndex("egroup"))+"" : "0");
+						c.close();
 						ok.setOnClickListener(new OnClickListener(){
 		
 							public void onClick(View arg0) {
-								if(Integer.parseInt(et.getText().toString()) <= maxValue && Integer.parseInt(et.getText().toString())>=0){
-									Editor e = mainActivity.saveFile.edit();
-									e.putInt("group"+mainActivity.MD5((String) curtv.getText()), Integer.parseInt(et.getText().toString()));
-									e.commit();
+								int group = Integer.parseInt(et.getText().toString());
+								if(group <= maxValue && group>=0){
+									if(create)
+										mainActivity.database.execSQL("INSERT INTO groups (title, type, egroup) VALUES ('"+grp_str[1]+"',"+type+","+group+")");
+									else
+										mainActivity.database.execSQL("UPDATE groups SET egroup = "+group+" WHERE title = '"+grp_str[1]+"' AND type = "+type);
 									d.dismiss();
 									Toast.makeText(settingsActivity.this, "Gruppe gesetzt.", Toast.LENGTH_LONG).show();
 								} else
@@ -290,5 +283,32 @@ public class settingsActivity extends Activity {
 			// Liste ist leer...
 			this.findViewById(R.id.grpFilterDesc).setVisibility(View.GONE);
 		}
+	}
+	
+	public class ScheduleLoader implements Runnable {
+
+		public void run() {
+			try {
+				HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/1.0/schedule?classname="+mainActivity.saveFile.getString("semester", "bai1"));
+				hg.setHeader("User-Agent", mainActivity.USERAGENT);
+				HttpResponse r = client.execute(hg);
+				String response = EntityUtils.toString(r.getEntity());
+				JSONArray result = new JSONArray(response);
+				if(result.length() != 0){
+					pd.setMessage(settingsActivity.this.getString(R.string.LANG_ANALYSING));
+					FHSSchedule.parsePlan(result);
+					Toast.makeText(settingsActivity.this, "Stundenplan wurde aktualisiert.", Toast.LENGTH_LONG).show();
+					try {
+						analyseScheduleForGroups();
+					} catch(Exception e1){}
+					pd.dismiss();
+				} else 
+					throw new Exception();
+			} catch (Exception e) {
+				pd.dismiss();
+				Toast.makeText(settingsActivity.this, "Es gab einen Fehler beim Herunterladen.\n\n"+e.getClass().getName()+": "+e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		}
+		
 	}
 }

@@ -1,11 +1,9 @@
 package michaels.spirit4android;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import org.json.JSONObject;
-
+import michaels.spirit4android.FHSSchedule.Event;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -48,16 +46,12 @@ public class TimeStreamView extends View implements OnTouchListener{
 			this.invalidate();
 			return;
 		}
-		JSONObject[] eventsAtDay = schedule.getEventsAtDay(day);
-		ArrayList<JSONObject> events = new ArrayList<JSONObject>();
-		for(short i = 0; i<eventsAtDay.length; i++)
-			if(eventsAtDay[i] != null)
-				events.add(eventsAtDay[i]);
-		int heightOfStripe = ((this.getHeight()-events.size())/(events.size()+1));
+		Event[] events = schedule.getEventsAtDay(day);
+		int heightOfStripe = ((this.getHeight()-events.length)/(events.length+1));
 		p.setTextSize(textSize);
 		
-		for(int i=0; i<events.size(); i++){
-			JSONObject jso = events.get(i);
+		for(int i=0; i<events.length; i++){
+			Event jso = events[i];
 			Calendar current = schedule.getNextCalendar(jso);
 			float start = i*(1+heightOfStripe);
 			float end = start+heightOfStripe;
@@ -65,12 +59,10 @@ public class TimeStreamView extends View implements OnTouchListener{
 			g.drawRect(0, start, this.getWidth(), end, p);
 
 			p.setColor(0xffffffff);
-			JSONObject jsoPlace = jso.optJSONObject("appointment").optJSONObject("location").
-					optJSONObject("place");
 			String toWrite = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
 						current.get(Calendar.MINUTE))+
-					"/"+jsoPlace.optString("building")+jsoPlace.optString("room")+": "+
-					jso.optString("titleShort")+" ("+jso.optString("eventType")+")";
+					"/"+jso.room+": "+jso.docent+" ("+
+						context.getString(jso.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
 			g.drawText(toWrite, 0, end-p.descent(), p);
 			current.set(Calendar.DAY_OF_YEAR, day.get(Calendar.DAY_OF_YEAR));
 			if(current.before(Calendar.getInstance())){
@@ -101,7 +93,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 		Rect r = new Rect();
 		p.getTextBounds(s, 0, s.length(), r);
 		g.drawText(s, this.getWidth()-r.width(), this.getHeight()-p.descent(), p);
-		if(events.size() == 0){
+		if(events.length == 0){
 			p.setColor(0xffffffff);
 			g.drawText("keine Veranstaltung", 0, r.height()+p.descent(), p);
 		}
@@ -152,28 +144,25 @@ public class TimeStreamView extends View implements OnTouchListener{
 		p.setTextSize(20);
 		
 		day = (day == null ? schedule.getNextCalendar(schedule.getNextEventIncludingCurrent()) : day);
-		JSONObject[] objects = schedule.getEventsAtDay(day);
+		Event[] objects = schedule.getEventsAtDay(day);
 		
 		String longestString = DateFormat.getDateInstance(DateFormat.LONG).format(day.getTime());
 		longestString = (longestString.length() < "keine Veranstaltung".length() ? 
 				"keine Veranstaltung" : longestString);
 		int widthOfLongest = 0;
 		short count = 0;
-		for(JSONObject currentEvent:objects){
-			if(currentEvent != null){
-				count++;
-				JSONObject currentPlace = currentEvent.optJSONObject("appointment").
-							optJSONObject("location").optJSONObject("place");
-				String toMeasure = DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.
-						getNextCalendar(currentEvent).getTime())+"/"+currentPlace.optString("building")+
-						currentPlace.optString("room")+": "+currentEvent.optString("titleShort")+" ("+
-						currentEvent.optString("eventType")+")";
-				Rect r = new Rect();
-				p.getTextBounds(toMeasure, 0, toMeasure.length(), r);
-				if(widthOfLongest < r.width()){
-					widthOfLongest = r.width();
-					longestString = toMeasure;
-				}
+		for(Event currentEvent:objects){
+			count++;
+			Calendar current = schedule.getNextCalendar(currentEvent);
+			String toMeasure = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
+					current.get(Calendar.MINUTE))+
+				"/"+currentEvent.room+": "+currentEvent.docent+" ("+
+					context.getString(currentEvent.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
+			Rect r = new Rect();
+			p.getTextBounds(toMeasure, 0, toMeasure.length(), r);
+			if(widthOfLongest < r.width()){
+				widthOfLongest = r.width();
+				longestString = toMeasure;
 			}
 		}
 		Rect r = new Rect();			

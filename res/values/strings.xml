@@ -31,6 +31,9 @@
 	<string name="LANG_COUNTDOWNDAY">~ %1$d Tag um %2$s</string>
 	<string name="LANG_NEXTEVENTIN">Nächstes Event (%s) in</string>
 	<string name="LANG_CLICKTOGETBACK">Hier "klicken" um zurück zum Countdown zu kommen&#8230;</string>
-	<string name="REST_ET_LECTURE">Vorlesung</string>
-	<string name="REST_ET_EXERCISE">Uebung</string>
+	<string name="LANG_LECTURE">Vorlesung</string>
+	<string name="LANG_EXERCISE">Übung</string>
+	<string name="LANG_ALARMTEXT">%1$s\n%2$s\nin %3$s um %4$02d:%5$02d</string>
+	<string name="LANG_DOWNLOADING">Herunterladen&#8230;</string>
+	<string name="LANG_ANALYSING">Analysieren&#8230;</string>
 </resources>

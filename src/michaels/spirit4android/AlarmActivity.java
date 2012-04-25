@@ -2,10 +2,7 @@ package michaels.spirit4android;
 
 import java.util.Calendar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import michaels.spirit4android.FHSSchedule.Event;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -43,14 +40,14 @@ public class AlarmActivity extends Activity {
 		this.startService(alarm_service);
 		
 		// get schedule and put eventinfo to the view
-		try {
-			schedule = new FHSSchedule(new JSONArray(settings.getString("scheduleJSON", "[]")),settings);
-		} catch (JSONException e) {}		
+		schedule = new FHSSchedule(this);
 		TextView event_info = (TextView) this.findViewById(R.id.alarm_eventinfo);
-		JSONObject event = schedule.getNextEvent();
-		JSONObject eventPlace = event.optJSONObject("appointment").optJSONObject("location").optJSONObject("place");
+		Event event = schedule.getNextEvent();
 		Calendar event_time = schedule.getNextCalendar(event);
-		event_info.setText(event.optString("titleShort")+"\n"+event.optString("eventType")+"\nin "+eventPlace.optString("building")+eventPlace.optString("room")+" um "+String.format("%02d:%02d", event_time.get(Calendar.HOUR_OF_DAY),event_time.get(Calendar.MINUTE)));
+		event_info.setText(String.format(getString(R.string.LANG_ALARMTEXT), 
+				event.title, 
+				getString(event.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE),
+				event.room, event_time.get(Calendar.HOUR_OF_DAY), event_time.get(Calendar.MINUTE))); // See strings.xml for format.
 		
 		// Set penetrant mode
 		if(settings.getBoolean("alarmPenetrantMode", true))

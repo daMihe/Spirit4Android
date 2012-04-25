@@ -7,8 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import michaels.spirit4android.FHSSchedule.Event;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -89,17 +89,9 @@ public class mainActivity extends Activity {
 			e.commit();
 		}
 		
-		if(schedule == null){
-			if(!saveFile.getString("scheduleJSON", "[]").equals("[]")){
-				try {
-					schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")),saveFile);
-				} catch (JSONException e) {}
-			}
-		}
-		
 		// Load Database
-		openDB();
-		
+		openDB(this);
+				
 		// Set last_news_update for dispRefresh
 		last_news_update = saveFile.getLong("lastUpdate", 0);
 		
@@ -107,35 +99,6 @@ public class mainActivity extends Activity {
 		this.setContentView(R.layout.main);
 		
 		this.refreshNews();
-		/*final ListView newsListe = (ListView) this.findViewById(R.id.newsListe);
-		try {
-			final JSONArray newsJSON = new JSONArray(saveFile.getString("newsJSON", "[]"));
-			String[] dispInList = new String[newsJSON.length()];
-			for(int i = 0; i<newsJSON.length(); i++){
-				dispInList[newsJSON.length()-1-i] = newsJSON.getJSONObject(i).getString("subject");	
-			}
-			ArrayAdapter<String> aas = new ArrayAdapter<String>(this, R.layout.listelement, dispInList);
-			newsListe.setAdapter(aas);
-			newsListe.setOnItemClickListener(new OnItemClickListener(){
-
-				public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long arg3) {
-					try {
-						newsObject = newsJSON.getJSONObject(newsJSON.length()-1-pos);
-						Intent i = new Intent(mainActivity.this,newsActivity.class);
-						mainActivity.this.startActivity(i);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-				
-			});
-		} catch (JSONException e) {
-			Log.e("Display Creation Error",e.getClass().getName()+": "+e.getMessage());
-		}*/
-		
-		preJSON = mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", "");
-		//Handler countdown = new Handler();
-		//countdown.post(new dispRefresh());
 		Handler updateHandler = new Handler();
 		updateHandler.postDelayed(new Updater(),10000);
 	}
@@ -146,9 +109,8 @@ public class mainActivity extends Activity {
 	}
 	
 	public void onResume(){
-		try {
-			schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")),saveFile);
-		} catch(Exception e){}
+		schedule = new FHSSchedule(this);
+		
 		pause = false;
 		Handler h = new Handler();
 		h.post(new dispRefresh());
@@ -189,44 +151,41 @@ public class mainActivity extends Activity {
 		return super.onOptionsItemSelected(mi);
 	}
 	
-	public void openDB(){
+	public static void openDB(Context c){
 		if(database == null)
-			database = this.openOrCreateDatabase("Spirit4Android", Context.MODE_WORLD_READABLE, null);
+			database = c.openOrCreateDatabase("Spirit4Android", Context.MODE_WORLD_READABLE, null);
 		database.execSQL("CREATE TABLE IF NOT EXISTS news (id INTEGER NOT NULL, title TEXT, author TEXT, receivers TEXT, date INTEGER, content TEXT)");
-		database.execSQL("CREATE TABLE IF NOT EXISTS schedule (time INTEGER NOT NULL, length INTEGER, title TEXT, docent TEXT, room TEXT, week INTEGER, type INTEGER)");
+		database.execSQL("CREATE TABLE IF NOT EXISTS schedule (time INTEGER NOT NULL, length INTEGER, title TEXT, docent TEXT, room TEXT, week INTEGER, type INTEGER, egroup INTEGER)");
+		database.execSQL("CREATE TABLE IF NOT EXISTS groups (title TEXT, type INTEGER, egroup INTEGER)");
+		if(saveFile == null)
+			saveFile = c.getSharedPreferences("s4apref",MODE_WORLD_READABLE);
 	}
 
 	public static void setAlarm(Context c, boolean today_too){
-		if(saveFile == null){
-			saveFile = c.getSharedPreferences("s4apref",MODE_WORLD_READABLE);
-			try {
-				schedule = new FHSSchedule(new JSONArray(saveFile.getString("scheduleJSON", "[]")), saveFile);
-			} catch (JSONException e) {}
-		}
-		if(saveFile.getLong("alarmtimeBeforeEvent", -1) > -1){
+		if(schedule == null)
+			schedule = new FHSSchedule(c);
+		long alarm_time_before_event = saveFile.getLong("alarmtimeBeforeEvent", -1);
+		if(alarm_time_before_event > -1 && schedule.length() > 0){
 			PendingIntent pending_intent = PendingIntent.getActivity(c, 0, new Intent(c,AlarmActivity.class), PendingIntent.FLAG_ONE_SHOT);
 			AlarmManager alarmator = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 			
-			JSONObject jo = schedule.getNextEvent();
-			Calendar jo_calendar = schedule.getNextCalendar(jo);
-			int current_day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-			if(today_too && jo_calendar.get(Calendar.DAY_OF_YEAR) == current_day){
-				JSONObject[] days_objects = schedule.getEventsAtDay(jo_calendar);
-				for(char i=0; i<days_objects.length; i++){
-					if(days_objects[i] != null){
-						if(days_objects[i] == jo){
-							alarmator.set(AlarmManager.RTC_WAKEUP,jo_calendar.getTimeInMillis()-saveFile.getLong("alarmtimeBeforeEvent", -1), pending_intent);
-							return;
-						} else
-							break;
-					}
+			Calendar current_day = Calendar.getInstance();
+			Calendar ttl = (Calendar) current_day.clone();
+			ttl.add(Calendar.DAY_OF_YEAR, 14);
+			current_day.set(Calendar.HOUR_OF_DAY, 0);
+			current_day.set(Calendar.MINUTE, 0);
+			current_day.set(Calendar.SECOND, 0);
+			Event[] days_events = schedule.getEventsAtDay(current_day);
+			
+			while(days_events.length == 0 || schedule.getNextCalendar(days_events[0]).before(Calendar.getInstance())){
+				current_day.add(Calendar.DAY_OF_MONTH, 1);
+				if(current_day.after(ttl)){
+					Log.e("AlarmSetter","Overflow!");
+					return;
 				}
+				days_events = schedule.getEventsAtDay(current_day);
 			}
-			while(jo_calendar.get(Calendar.DAY_OF_YEAR) == current_day){
-				jo = schedule.getNextEvent(jo_calendar);
-				jo_calendar = schedule.getNextCalendar(jo);
-			}
-			alarmator.set(AlarmManager.RTC_WAKEUP, jo_calendar.getTimeInMillis()-saveFile.getLong("alarmtimeBeforeEvent", -1), pending_intent);
+			alarmator.set(AlarmManager.RTC_WAKEUP, schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event, pending_intent);
 		}
 	}
 	
@@ -288,7 +247,7 @@ public class mainActivity extends Activity {
 		
 		public void run() {
 			if(!pause){
-				if(schedule.length() == 0){
+				if(mainActivity.schedule.length() == 0){
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan)).setVisibility(View.VISIBLE);
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.GONE);
 					((TextView)mainActivity.this.findViewById(R.id.countdown)).setVisibility(View.GONE);
@@ -298,7 +257,8 @@ public class mainActivity extends Activity {
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.VISIBLE);
 					if(tsv == null || tsv.switchDayAutomatically){							
 						TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
-						JSONObject c = schedule.getNextEvent();
+						Event c = schedule.getNextEvent();
+						
 						Calendar nCalendar = schedule.getNextCalendar(c);
 						long zeitDifferenz = nCalendar.getTimeInMillis()- new GregorianCalendar().getTimeInMillis();
 						long stunden  = (zeitDifferenz / (3600*1000));
@@ -315,7 +275,7 @@ public class mainActivity extends Activity {
 										DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getNextCalendar(schedule.getNextEvent()).getTime())) : 
 								String.format("%02d:%02d:%02d", stunden,minuten,sekunden));
 						countdown.setVisibility(View.VISIBLE);
-						nevent.setText(String.format(getString(R.string.LANG_NEXTEVENTIN), c.optString("eventType")));
+						nevent.setText(String.format(getString(R.string.LANG_NEXTEVENTIN), getString(c.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)));
 						if(tsv == null || tsv.schedule != schedule){
 							tsv = new TimeStreamView(mainActivity.this,schedule);
 							((LinearLayout) mainActivity.this.findViewById(R.id.main_plan_alternative)).removeAllViews();

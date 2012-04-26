@@ -37,9 +37,9 @@ public class TimeStreamView extends View implements OnTouchListener{
 		
 		day.set(Calendar.HOUR_OF_DAY, 0);
 		day.set(Calendar.MINUTE, 0);
-		//Calendar nextEvent = schedule.getNextCalendar(schedule.getNextEvent());
-		if(day.get(Calendar.DAY_OF_YEAR) != schedule.getNextCalendar(
-				schedule.getNextEventIncludingCurrent()).get(Calendar.DAY_OF_YEAR) &&
+		//If Date Changed since last draw and current activated mode is "normal"
+		if(day.get(Calendar.DAY_OF_YEAR) != schedule.getCalendar(
+				schedule.getNextEventIncludingCurrent(),true).get(Calendar.DAY_OF_YEAR) &&
 				this.switchDayAutomatically){
 			day = null;
 			this.requestLayout();
@@ -52,7 +52,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 		
 		for(int i=0; i<events.length; i++){
 			Event jso = events[i];
-			Calendar current = schedule.getNextCalendar(jso);
+			Calendar current = schedule.getCalendar(jso,true);
 			float start = i*(1+heightOfStripe);
 			float end = start+heightOfStripe;
 			p.setColor(0xff00386a);
@@ -61,19 +61,19 @@ public class TimeStreamView extends View implements OnTouchListener{
 			p.setColor(0xffffffff);
 			String toWrite = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
 						current.get(Calendar.MINUTE))+
-					"/"+jso.room+": "+jso.docent+" ("+
+					"/"+jso.room+": "+jso.title+" ("+
 						context.getString(jso.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
 			g.drawText(toWrite, 0, end-p.descent(), p);
 			current.set(Calendar.DAY_OF_YEAR, day.get(Calendar.DAY_OF_YEAR));
 			if(current.before(Calendar.getInstance())){
-				Calendar endOfEvent = (Calendar) current.clone();
-				endOfEvent.add(Calendar.MINUTE, 90);
-				endOfEvent = (Calendar.getInstance().before(endOfEvent) ? 
-						Calendar.getInstance():endOfEvent);
-				float timeUp = this.getWidth() * 
-						((endOfEvent.get(Calendar.HOUR_OF_DAY)-current.get(Calendar.HOUR_OF_DAY))*3600f+
-						(endOfEvent.get(Calendar.MINUTE)-current.get(Calendar.MINUTE))*60f+
-						(endOfEvent.get(Calendar.SECOND)-current.get(Calendar.SECOND)))/(90f*60f);
+				Calendar end_of_event = Calendar.getInstance();
+				end_of_event.set(Calendar.HOUR_OF_DAY,0);
+				end_of_event.set(Calendar.MINUTE,0);
+				end_of_event.set(Calendar.SECOND,0);
+				end_of_event.add(Calendar.DAY_OF_MONTH, -end_of_event.get(Calendar.DAY_OF_WEEK));
+				end_of_event.add(Calendar.SECOND,(int)(jso.time+jso.length));
+				float factor =(end_of_event.before(Calendar.getInstance()) ? 1f : (System.currentTimeMillis()/1000-current.getTimeInMillis()/1000)/(float)(jso.length));
+				float timeUp = this.getWidth() * factor;
 				p.setColor(0xaa000000);
 				g.drawRect(0, start, timeUp, end, p);
 			}
@@ -143,7 +143,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 		Paint p = new Paint();
 		p.setTextSize(20);
 		
-		day = (day == null ? schedule.getNextCalendar(schedule.getNextEventIncludingCurrent()) : day);
+		day = (day == null ? schedule.getCalendar(schedule.getNextEventIncludingCurrent(),true) : day);
 		Event[] objects = schedule.getEventsAtDay(day);
 		
 		String longestString = DateFormat.getDateInstance(DateFormat.LONG).format(day.getTime());
@@ -156,7 +156,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 			Calendar current = schedule.getNextCalendar(currentEvent);
 			String toMeasure = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
 					current.get(Calendar.MINUTE))+
-				"/"+currentEvent.room+": "+currentEvent.docent+" ("+
+				"/"+currentEvent.room+": "+currentEvent.title+" ("+
 					context.getString(currentEvent.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
 			Rect r = new Rect();
 			p.getTextBounds(toMeasure, 0, toMeasure.length(), r);

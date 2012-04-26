@@ -46,6 +46,7 @@ public class mainActivity extends Activity {
 	public static String preJSON = "";
 	public static SQLiteDatabase database = null;
 	public static long last_news_update = 0;
+	public static long alarm_already_set_to = 0;
 	boolean pause;
 	boolean showCompletePlan;
 	static FHSSchedule schedule;
@@ -185,7 +186,11 @@ public class mainActivity extends Activity {
 				}
 				days_events = schedule.getEventsAtDay(current_day);
 			}
-			alarmator.set(AlarmManager.RTC_WAKEUP, schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event, pending_intent);
+			long time_to_set = schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event;	
+			if(time_to_set != alarm_already_set_to){
+				alarmator.set(AlarmManager.RTC_WAKEUP, schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event, pending_intent);
+				alarm_already_set_to = time_to_set;
+			}
 		}
 	}
 	
@@ -258,13 +263,12 @@ public class mainActivity extends Activity {
 					if(tsv == null || tsv.switchDayAutomatically){							
 						TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
 						Event c = schedule.getNextEvent();
-						
-						Calendar nCalendar = schedule.getNextCalendar(c);
-						long zeitDifferenz = nCalendar.getTimeInMillis()- new GregorianCalendar().getTimeInMillis();
+						Calendar ccalendar = schedule.getCalendar(c, false);
+						long zeitDifferenz = ccalendar.getTimeInMillis()- new GregorianCalendar().getTimeInMillis();
 						long stunden  = (zeitDifferenz / (3600*1000));
 						long minuten  = (zeitDifferenz / 60000) - (stunden * 60);
 						long sekunden = (zeitDifferenz / 1000) - (stunden*3600+minuten*60);
-						GregorianCalendar bzt = (GregorianCalendar) nCalendar.clone();
+						GregorianCalendar bzt = (GregorianCalendar) ccalendar.clone();
 						bzt.set(Calendar.HOUR_OF_DAY, 0);
 						bzt.set(Calendar.MINUTE, 0);
 						long tage = (bzt.getTimeInMillis()-new GregorianCalendar().getTimeInMillis())/(24*60*60*1000) +1;

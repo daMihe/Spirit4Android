@@ -145,23 +145,25 @@ public class FHSSchedule {
 	
 	public Event getNextEventIncludingCurrent(){
 		Calendar actualTime = Calendar.getInstance();
+		Calendar week_start = (Calendar) actualTime.clone();
+		week_start.set(Calendar.HOUR_OF_DAY, 0);
+		week_start.set(Calendar.MINUTE, 0);
+		week_start.set(Calendar.SECOND, 0);
+		week_start.add(Calendar.DAY_OF_YEAR,-week_start.get(Calendar.DAY_OF_WEEK));
+		long w_s = week_start.getTimeInMillis();
 		
 		Event[] currentDay = this.getEventsAtDay(actualTime);
 		for(int i=0; i<currentDay.length; i++){
-			Calendar end = (Calendar) actualTime.clone();
-			end.set(Calendar.HOUR_OF_DAY, 0);
-			end.set(Calendar.MINUTE, 0);
-			end.set(Calendar.SECOND, 0);
-			end.set(Calendar.DAY_OF_YEAR, -end.get(Calendar.DAY_OF_WEEK));
-			end.add(Calendar.SECOND, (int) (currentDay[i].time+currentDay[i].length));
-			if(actualTime.before(end))
+			long start = w_s+(currentDay[i].time *1000);
+			long end = start+(currentDay[i].length *1000);
+			if(System.currentTimeMillis()<end && System.currentTimeMillis()>start)
 				return currentDay[i];
 		}		
 		// no event today. return next.
 		return getNextEvent();
 	}
 	
-	public Calendar getNextCalendar(Event jso){
+	public Calendar getCalendar(Event jso, boolean current){
 		if(jso == null){
 			throw new NullPointerException();
 		}
@@ -170,12 +172,18 @@ public class FHSSchedule {
 		rtn.set(Calendar.HOUR_OF_DAY, 0);
 		rtn.set(Calendar.MINUTE, 0);
 		rtn.set(Calendar.SECOND, 0);
+		rtn.set(Calendar.MILLISECOND, 0);
 		rtn.add(Calendar.SECOND, (int) jso.time);
-		if(rtn.before(Calendar.getInstance()))
+		long systime = System.currentTimeMillis();
+		if(rtn.before(Calendar.getInstance()) && (!current || !(rtn.getTimeInMillis() < systime && rtn.getTimeInMillis()+jso.length*1000 > systime))) 
 			rtn.add(Calendar.DAY_OF_YEAR,7);
 		if(((rtn.get(Calendar.WEEK_OF_YEAR)%2+1)&jso.week) == 0)
 			rtn.add(Calendar.DAY_OF_YEAR, 7);
 		return rtn;
+	}
+	
+	public Calendar getNextCalendar(Event e){
+		return getCalendar(e,false);
 	}
 	
 	public static String MD5(String toHash){
@@ -211,6 +219,7 @@ public class FHSSchedule {
 						Integer.parseInt(pre_time.substring(3,5))*60; // Minutes -> start
 				length += Integer.parseInt(pre_time.substring(6,8))*60*60 + //Hours -> length
 						Integer.parseInt(pre_time.substring(9))*60; // Minutes -> length
+				length = length - time;
 				
 				String pre_week = appointment.getString("week").trim();
 				byte week = (pre_week.equals("w") ? EVENT_RYTHM_WEEKLY : (pre_week.equals("g") ? EVENT_RYTHM_EVEN : EVENT_RYTHM_ODD));
@@ -224,7 +233,7 @@ public class FHSSchedule {
 				byte group = (pre_group.equals("") ? 0 : Byte.parseByte(pre_group));
 				
 				mainActivity.database.execSQL("INSERT INTO schedule (time, length, egroup, week, room, title, docent, type) VALUES ("+
-				time+","+length+","+group+", "+week+", '"+room+"', "+current.getString("titleShort")+", '"+current.getJSONArray("member").getJSONObject(0).getString("name")+"', "+type+")");
+				time+","+length+","+group+", "+week+", '"+room+"', '"+current.getString("titleShort")+"', '"+current.getJSONArray("member").getJSONObject(0).getString("name")+"', "+type+")");
 			}
 		} catch(Exception e){
 			Log.e("FHSSchedule-Parser", "Invalid JSON!");

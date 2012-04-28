@@ -16,7 +16,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 	Context context;
 	FHSSchedule schedule;
 	float textSize = 0f;
-	Calendar day;
+	Calendar day; 
 	boolean showChangeDay = false;
 	boolean switchDayAutomatically = true;
 	float touchDown = -1;

@@ -29,10 +29,12 @@ public class newsActivity extends Activity {
 			String who = "";
 			String[] befWho = c.getString(c.getColumnIndex("receivers")).split(" ");
 			for(String bw:befWho)
-				who += " "+(bw.equals("") ? "" : (bw.equals("semester") ? "Alle" : bw))+",";
+				who += " "+(bw.equals("") ? "" : (bw.equals("semester") ? getString(R.string.LANG_ALLSEMESTERS) : bw))+",";
 			if(who.length() != 0)
 				who = who.substring(0, who.length()-1);
-			newsDesc.setText("geschrieben von "+c.getString(c.getColumnIndex("author"))+" am "+DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(c.getLong(c.getColumnIndex("date"))))+" an"+who);
+			if(who.length() == 0)
+				who = getString(R.string.LANG_ALLSEMESTERS); 
+			newsDesc.setText(String.format(getString(R.string.LANG_WRITTENBYFOR), c.getString(c.getColumnIndex("author")), DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(c.getLong(c.getColumnIndex("date")))),who));
 			WebView newsDisp = (WebView) this.findViewById(R.id.newsDisp);
 			newsDisp.setBackgroundColor(android.R.color.black);
 			String html = "";

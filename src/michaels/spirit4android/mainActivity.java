@@ -46,7 +46,6 @@ public class mainActivity extends Activity {
 	public static String preJSON = "";
 	public static SQLiteDatabase database = null;
 	public static long last_news_update = 0;
-	public static long alarm_already_set_to = 0;
 	boolean pause;
 	boolean showCompletePlan;
 	static FHSSchedule schedule;
@@ -162,7 +161,9 @@ public class mainActivity extends Activity {
 			saveFile = c.getSharedPreferences("s4apref",MODE_WORLD_READABLE);
 	}
 
-	public static void setAlarm(Context c, boolean today_too){
+	public static void setAlarm(Context c, boolean force){
+		// Function to set Alarm. Context is needed for launching activity, function has a dual-calling-prevention.
+		// Set force to true, if you want to set the alarm in any case.
 		if(schedule == null)
 			schedule = new FHSSchedule(c);
 		long alarm_time_before_event = saveFile.getLong("alarmtimeBeforeEvent", -1);
@@ -171,25 +172,34 @@ public class mainActivity extends Activity {
 			AlarmManager alarmator = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 			
 			Calendar current_day = Calendar.getInstance();
-			Calendar ttl = (Calendar) current_day.clone();
-			ttl.add(Calendar.DAY_OF_YEAR, 14);
+			long actual_time = current_day.get(Calendar.DAY_OF_WEEK)*24*60*60 +
+					current_day.get(Calendar.HOUR_OF_DAY)*60*60 +
+					current_day.get(Calendar.MINUTE)*60+
+					current_day.get(Calendar.SECOND);
 			current_day.set(Calendar.HOUR_OF_DAY, 0);
 			current_day.set(Calendar.MINUTE, 0);
 			current_day.set(Calendar.SECOND, 0);
 			Event[] days_events = schedule.getEventsAtDay(current_day);
 			
-			while(days_events.length == 0 || schedule.getNextCalendar(days_events[0]).before(Calendar.getInstance())){
+			// if first event of today is before now, add a day and update events-array 
+			if(days_events.length > 0 && days_events[0].time < actual_time){
 				current_day.add(Calendar.DAY_OF_MONTH, 1);
-				if(current_day.after(ttl)){
-					Log.e("AlarmSetter","Overflow!");
-					return;
-				}
 				days_events = schedule.getEventsAtDay(current_day);
 			}
+			
+			while(days_events.length == 0 || schedule.getNextCalendar(days_events[0]).before(Calendar.getInstance())){
+				current_day.add(Calendar.DAY_OF_MONTH, 1);
+				days_events = schedule.getEventsAtDay(current_day);
+			}
+			
 			long time_to_set = schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event;	
-			if(time_to_set != alarm_already_set_to){
+			if(time_to_set != saveFile.getLong("last_alarm_set", 0) || force){
 				alarmator.set(AlarmManager.RTC_WAKEUP, schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event, pending_intent);
-				alarm_already_set_to = time_to_set;
+				
+				// Preventing double setting of alarm at same time. Use parameter force, to set it without prevention.
+				Editor e = saveFile.edit();
+				e.putLong("last_alarm_set", time_to_set);
+				e.commit();
 			}
 		}
 	}

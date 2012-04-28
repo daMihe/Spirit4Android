@@ -2,9 +2,14 @@ Changelog for Spirit4Android
 
 Planned for future (priority from top to bottom)
 - Add Spare-Time
-- Multi-Language the app (as far as possible)
 
-Version 0.6 (not yet released, but working on it) State from 2012-Apr-20 07:10
+Version 0.6.1
+- Fixed version 0.6: There were several errors while pushing it to github. I had
+  to rewrite more or less all changes of 0.6.
+- Multilanguaged the app. All texts, which are displayed by the app, are now
+  available in english, too. News and names of events cannot be translated.
+
+Version 0.6
 - Bug fixed: When selecting a song for alarm, the selection was changed when the
   settings were opened again.
 - System changed: News are now saved in a database. This is faster and allows to

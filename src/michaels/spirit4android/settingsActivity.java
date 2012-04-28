@@ -94,25 +94,25 @@ public class settingsActivity extends Activity {
 		final Spinner alarm_spinner = (Spinner) this.findViewById(R.id.alarmMedia);
 		final ToggleButton alarm_penetrant = (ToggleButton) this.findViewById(R.id.alarmPenetrant);
 		final Button alarmActivated = (Button) this.findViewById(R.id.alarmActivated);
-		alarmActivated.setText("Erinnerung ist "+(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) > -1 ? "ein" : "aus")+"geschaltet");
+		alarmActivated.setText(getString(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) > -1 ? R.string.LANG_ALARMENABLED : R.string.LANG_ALARMDISABLED));
 		alarmActivated.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View arg0) {
 				AlertDialog.Builder adb = new AlertDialog.Builder(settingsActivity.this);
-				adb.setMessage("Bitte setzen Sie die Zeit (in Minuten) fest, die Sie vor dem nächsten Event errinnert werden möchten:");
-				adb.setTitle("Erinnerung...");
+				adb.setMessage(R.string.LANG_ALARMDIALOGTEXT);
+				adb.setTitle(R.string.LANG_ALARMDIALOGTITLE);
 				final EditText tf = new EditText(settingsActivity.this);
 				tf.setKeyListener(new DigitsKeyListener());
 				tf.setText(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", 20*60*1000)/(60*1000)+"");
 				adb.setView(tf);
-				adb.setPositiveButton("Aktivieren", new DialogInterface.OnClickListener() {
+				adb.setPositiveButton(R.string.LANG_ENABLE, new DialogInterface.OnClickListener() {
 					
 					public void onClick(DialogInterface dialog, int which) {
 						long number = Long.parseLong(tf.getText().toString());
 						Editor e = mainActivity.saveFile.edit();
 						e.putLong("alarmtimeBeforeEvent", number*60*1000);
 						e.commit();
-						alarmActivated.setText("Erinnerung ist eingeschaltet");
+						alarmActivated.setText(getString(R.string.LANG_ALARMENABLED));
 						dialog.dismiss();
 						alarm_penetrant.setEnabled(true);
 						alarm_spinner.setEnabled(alarm_cursor != null);
@@ -133,13 +133,13 @@ public class settingsActivity extends Activity {
 						}
 					}
 				});
-				adb.setNegativeButton("Deaktivieren", new DialogInterface.OnClickListener() {
+				adb.setNegativeButton(R.string.LANG_DISABLE, new DialogInterface.OnClickListener() {
 					
 					public void onClick(DialogInterface dialog, int which) {
 						Editor e = mainActivity.saveFile.edit();
 						e.putLong("alarmtimeBeforeEvent", -1);
 						e.commit();
-						alarmActivated.setText("Erinnerung ist ausgeschaltet");
+						alarmActivated.setText(getString(R.string.LANG_ALARMDISABLED));
 						dialog.dismiss();
 						alarm_penetrant.setEnabled(false);
 						alarm_spinner.setEnabled(false);
@@ -176,9 +176,9 @@ public class settingsActivity extends Activity {
 			String alarm_music = mainActivity.saveFile.getString("alarmMusic", "");
 			while(!alarm_cursor.isAfterLast()){
 				//Log.i("Info", c.getColumnIndex(MediaStore.Audio.Media.ARTIST)+","+c.getColumnIndex(MediaStore.Audio.Media.TITLE));
-				music.add((alarm_cursor.isNull(alarm_cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)) ? "" : alarm_cursor.getString(alarm_cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))+" - ")+alarm_cursor.getString(alarm_cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+				music.add(alarm_cursor.getString(alarm_cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))+" - "+alarm_cursor.getString(alarm_cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
 				if(alarm_cursor.getString(alarm_cursor.getColumnIndex(Media.DATA)).contentEquals(alarm_music))
-					current = alarm_cursor.getPosition();
+					current = alarm_cursor.getPosition()+1;
 				alarm_cursor.moveToNext();
 			}
 		} else
@@ -187,7 +187,7 @@ public class settingsActivity extends Activity {
 		alarm_spinner.setEnabled(alarm_cursor != null && alarm_cursor.getCount() > 0);
 		alarm_spinner.setAdapter(alarm_spinner_adapter);
 		if(current != 0)
-			alarm_spinner.setSelection(current+1);
+			alarm_spinner.setSelection(current);
 		alarm_spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
 
 			public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long arg3) {
@@ -252,7 +252,7 @@ public class settingsActivity extends Activity {
 						final Button ok = (Button) d.findViewById(R.id.saveGroup);
 						final int maxValue = settingsActivity.this.groups.get(curtv.getText());
 						final String[] grp_str = curtv.getText().toString().split("/");
-						tv.setText("Gib eine Gruppennummer [min. 0 (= Event deaktiviert), max. "+maxValue+"] für "+curtv.getText()+" ein:");
+						tv.setText(String.format(getString(R.string.LANG_SETGROUPFOREVENT),maxValue,curtv.getText()));
 						final byte type = (grp_str.equals(getString(R.string.LANG_LECTURE)) ? FHSSchedule.EVENT_LECTURE : FHSSchedule.EVENT_EXERCISE);
 						Cursor c = mainActivity.database.rawQuery("SELECT egroup FROM groups WHERE type = "+type+" AND title = '"+grp_str[1]+"'", null);
 						final boolean create = c.moveToFirst();
@@ -268,9 +268,9 @@ public class settingsActivity extends Activity {
 									else
 										mainActivity.database.execSQL("UPDATE groups SET egroup = "+group+" WHERE title = '"+grp_str[1]+"' AND type = "+type);
 									d.dismiss();
-									Toast.makeText(settingsActivity.this, "Gruppe gesetzt.", Toast.LENGTH_LONG).show();
+									Toast.makeText(settingsActivity.this, getString(R.string.LANG_GROUPSETSUCCESSFULLY), Toast.LENGTH_LONG).show();
 								} else
-									Toast.makeText(settingsActivity.this, "Eingabe ist ungültig.", Toast.LENGTH_LONG).show();
+									Toast.makeText(settingsActivity.this, getString(R.string.LANG_INVALIDINPUT), Toast.LENGTH_LONG).show();
 							}
 							
 						});
@@ -297,7 +297,7 @@ public class settingsActivity extends Activity {
 				if(result.length() != 0){
 					pd.setMessage(settingsActivity.this.getString(R.string.LANG_ANALYSING));
 					FHSSchedule.parsePlan(result);
-					Toast.makeText(settingsActivity.this, "Stundenplan wurde aktualisiert.", Toast.LENGTH_LONG).show();
+					Toast.makeText(settingsActivity.this, getString(R.string.LANG_SCHEDULEDOWNLOADEDSUCCESSFULLY), Toast.LENGTH_LONG).show();
 					try {
 						analyseScheduleForGroups();
 					} catch(Exception e1){}
@@ -306,9 +306,8 @@ public class settingsActivity extends Activity {
 					throw new Exception();
 			} catch (Exception e) {
 				pd.dismiss();
-				Toast.makeText(settingsActivity.this, "Es gab einen Fehler beim Herunterladen.\n\n"+e.getClass().getName()+": "+e.getMessage(), Toast.LENGTH_LONG).show();
+				Toast.makeText(settingsActivity.this, String.format(getString(R.string.LANG_ERRORWHILELOADINGPLAN), e.getClass().getName(), e.getMessage()), Toast.LENGTH_LONG).show();
 			}
 		}
-		
 	}
 }

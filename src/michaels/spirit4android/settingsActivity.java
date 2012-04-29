@@ -253,10 +253,11 @@ public class settingsActivity extends Activity {
 						final int maxValue = settingsActivity.this.groups.get(curtv.getText());
 						final String[] grp_str = curtv.getText().toString().split("/");
 						tv.setText(String.format(getString(R.string.LANG_SETGROUPFOREVENT),maxValue,curtv.getText()));
-						final byte type = (grp_str.equals(getString(R.string.LANG_LECTURE)) ? FHSSchedule.EVENT_LECTURE : FHSSchedule.EVENT_EXERCISE);
+						final byte type = (grp_str[0].equals(getString(R.string.LANG_LECTURE)) ? FHSSchedule.EVENT_LECTURE : FHSSchedule.EVENT_EXERCISE);
 						Cursor c = mainActivity.database.rawQuery("SELECT egroup FROM groups WHERE type = "+type+" AND title = '"+grp_str[1]+"'", null);
-						final boolean create = c.moveToFirst();
-						et.setText(create ? c.getInt(c.getColumnIndex("egroup"))+"" : "0");
+						c.moveToFirst();
+						final boolean create = c.isAfterLast();
+						et.setText(create ? "0": c.getInt(c.getColumnIndex("egroup"))+"");
 						c.close();
 						ok.setOnClickListener(new OnClickListener(){
 		

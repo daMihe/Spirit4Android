@@ -1,7 +1,10 @@
-Changelog for Spirit4Android
+﻿Changelog for Spirit4Android
 
 Planned for future (priority from top to bottom)
 - Add Spare-Time
+
+Version 0.6.2
+- Fixed Bug: Group was not saved.
 
 Version 0.6.1
 - Fixed version 0.6: There were several errors while pushing it to github. I had

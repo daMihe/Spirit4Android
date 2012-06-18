@@ -2,6 +2,12 @@
 
 Planned for future (priority from top to bottom)
 - Add Spare-Time
+- Add Event-Manager (for adding and removing events manually)
+- Add Homescreen-Widget
+
+Version 0.7 (no binary currently released)
+- Fixed Bug: Scrolling the news-list is now possible after starting a news-
+  update, too.
 
 Version 0.6.2
 - Fixed Bug: Group was not saved.

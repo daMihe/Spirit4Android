@@ -2,7 +2,6 @@ package michaels.spirit4android;
 
 import java.security.MessageDigest;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,7 +21,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -32,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,6 +47,7 @@ public class mainActivity extends Activity {
 	boolean showCompletePlan;
 	static FHSSchedule schedule;
 	static TimeStreamView tsv;
+	static NewsAdapter news_list_adapter;
 	
 	public void onStart(){
 		super.onStart();
@@ -97,6 +95,10 @@ public class mainActivity extends Activity {
 		
 		//Oberfläche
 		this.setContentView(R.layout.main);
+		
+		// Bereite News-Listen-Adpater für die Verwendung vor
+		news_list_adapter = new NewsAdapter(this,database);
+		((ListView) this.findViewById(R.id.newsListe)).setAdapter(news_list_adapter);
 		
 		this.refreshNews();
 		Handler updateHandler = new Handler();
@@ -222,35 +224,11 @@ public class mainActivity extends Activity {
 	
 	public void refreshNews(){
 		ListView news_list = (ListView) this.findViewById(R.id.newsListe);
-		Cursor c = database.rawQuery("SELECT id, title, receivers FROM news ORDER BY date DESC", null);
-		c.moveToFirst();
-		String news_semester = saveFile.getString("semester", "");
-		news_semester.toLowerCase();
-		news_semester = (news_semester.startsWith("ba") ? news_semester.substring(2) : news_semester);
-		ArrayList<String> news_to_show = new ArrayList<String>();
-		final ArrayList<Integer> news_ids = new ArrayList<Integer>();
-		while(!c.isAfterLast()){
-			String[] semester = c.getString(c.getColumnIndex("receivers")).split(" ");
-			boolean show = news_semester.equals("");
-			for(int i = 0; i<semester.length && !show; i++){
-				String s = semester[i].toLowerCase();
-				if(s.equals(news_semester) || s.equals("") || s.equals("semester"))
-					show = true;
-			}
-			if(show){
-				news_to_show.add(c.getString(c.getColumnIndex("title")));
-				news_ids.add(c.getInt(c.getColumnIndex("id")));
-			}
-			c.moveToNext();
-		}
-		c.close();
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.listelement,news_to_show);
-		news_list.setAdapter(adapter);
-		
+		news_list_adapter.updateData();
 		news_list.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				newsActivity.id = news_ids.get(arg2);
+				newsActivity.id = (int) news_list_adapter.getItemId(arg2);
 				Intent intent = new Intent(mainActivity.this,newsActivity.class);
 				mainActivity.this.startActivity(intent);
 			}

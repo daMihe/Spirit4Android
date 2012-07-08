@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">Spirit</string>
     <string name="LANG_NOSOUNDSFOUND">any sound-file found on your SD</string>
@@ -46,7 +46,7 @@
 	<string name="LANG_DENYINGLICENSE">i have not read, not understood, disagree the terms of or dont want to read the license.</string>
 	<string name="LANG_MENU_UPDATENEWS">update news now</string>
 	<string name="LANG_MENU_UPDATEINFO">last success. update</string>
-	<string name="LANG_MENU_SETTINGS">schedule-settings</string>
+	<string name="LANG_MENU_SETTINGS">settings</string>
 	<string name="LANG_MENU_ABOUT">about spirit4android</string>
 	<string name="LANG_ALARMENABLED">alarm is enabled</string>
 	<string name="LANG_ALARMDISABLED">alarm is disabled</string>
@@ -56,4 +56,20 @@
 	<string name="LANG_ALARMDIALOGTEXT">Please set the time (in minutes) the alarm should ring before your first event on a day.</string>
 	<string name="LANG_WRITTENBYFOR">written at %2$s by %1$s to %3$s</string>
 	<string name="LANG_ALLSEMESTERS">all semesters</string>
+	<string name="LANG_EXTENDEDSCHEDULEEDITOR_TEXT">This is the extended schedule editor. In this window you can add, remove or change events. Maybe there are some events which are not for you (but for other groups). Note that this editor overwrites the normal schedule and the normal schedule overwrites this.</string>
+	<string name="LANG_SETTINGS_SIMPLE">Simple Settings</string>
+	<string name="LANG_SETTINGS_ALARM">Alarm</string>
+	<string name="LANG_SETTINGS_ADVANCEDSCHEDULEEDITOR">Adv. Schedule-Editor</string>
+	<string name="LANG_CANCEL">Cancel</string>
+	<string name="LANG_ASE_TITLE">title</string>
+	<string name="LANG_ASE_DOCENT">docent</string>
+	<string name="LANG_ASE_DAY">weekday</string>
+	<string name="LANG_ASE_ODDWEEKS">odd weeks</string>
+	<string name="LANG_ASE_EVENWEEKS">even weeks</string>
+	<string name="LANG_ASE_TIME">time of beginning</string>
+	<string name="LANG_ASE_LENGTH">length (sec)</string>
+	<string name="LANG_ASE_ROOM">room</string>
+	<string name="LANG_ASE_GROUP">groupnumber</string>
+	<string name="LANG_ASE_EVENTEDITOR">Event-editor</string>
+	<string name="LANG_DELETE">delete</string>
 </resources>

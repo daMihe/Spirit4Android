@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -12,6 +13,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -32,25 +34,57 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class settingsActivity extends Activity {
 	
+	static final String[] DAYS = new String[]{
+		"Su","Mo","Tu","We","Th","Fr","Sa"
+	};
+	
 	HashMap<String,Integer> groups = new HashMap<String,Integer>();
 	DefaultHttpClient client = new DefaultHttpClient();
 	Cursor alarm_cursor;
+	Cursor plan_cursor;
 	ProgressDialog pd;
 	
 	public void onCreate(Bundle b){
 		super.onCreate(b);
 		this.setContentView(R.layout.settings);
+		
+		//initialize Tabs
+		TabHost th = (TabHost) this.findViewById(R.id.settings_tabhost);
+		th.setup();
+		
+		TabSpec tab_simple = th.newTabSpec("tab1");
+		tab_simple.setContent(R.id.simple_settings);
+		tab_simple.setIndicator(getString(R.string.LANG_SETTINGS_SIMPLE),getResources().getDrawable(R.drawable.settings_simple));
+		
+		TabSpec tab_alarm = th.newTabSpec("tab2");
+		tab_alarm.setContent(R.id.alarm_settings);
+		tab_alarm.setIndicator(getString(R.string.LANG_SETTINGS_ALARM),getResources().getDrawable(R.drawable.settings_alarm));
+		
+		TabSpec tab_advanced = th.newTabSpec("tab3");
+		tab_advanced.setContent(R.id.advanced_plan_editor);
+		tab_advanced.setIndicator(getString(R.string.LANG_SETTINGS_ADVANCEDSCHEDULEEDITOR),getResources().getDrawable(R.drawable.settings_advanced));
+		
+		th.addTab(tab_simple);
+		th.addTab(tab_alarm);
+		th.addTab(tab_advanced);
+		
+		// Fill with contents
+		// Simple Settings
 		
 		@SuppressWarnings("rawtypes")
 		final ArrayAdapter aas = ArrayAdapter.createFromResource(this, R.array.studiengang, android.R.layout.simple_spinner_item);
@@ -93,61 +127,47 @@ public class settingsActivity extends Activity {
 		
 		final Spinner alarm_spinner = (Spinner) this.findViewById(R.id.alarmMedia);
 		final ToggleButton alarm_penetrant = (ToggleButton) this.findViewById(R.id.alarmPenetrant);
-		final Button alarmActivated = (Button) this.findViewById(R.id.alarmActivated);
-		alarmActivated.setText(getString(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) > -1 ? R.string.LANG_ALARMENABLED : R.string.LANG_ALARMDISABLED));
-		alarmActivated.setOnClickListener(new OnClickListener(){
-
-			public void onClick(View arg0) {
-				AlertDialog.Builder adb = new AlertDialog.Builder(settingsActivity.this);
-				adb.setMessage(R.string.LANG_ALARMDIALOGTEXT);
-				adb.setTitle(R.string.LANG_ALARMDIALOGTITLE);
-				final EditText tf = new EditText(settingsActivity.this);
-				tf.setKeyListener(new DigitsKeyListener());
-				tf.setText(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", 20*60*1000)/(60*1000)+"");
-				adb.setView(tf);
-				adb.setPositiveButton(R.string.LANG_ENABLE, new DialogInterface.OnClickListener() {
-					
-					public void onClick(DialogInterface dialog, int which) {
-						long number = Long.parseLong(tf.getText().toString());
-						Editor e = mainActivity.saveFile.edit();
-						e.putLong("alarmtimeBeforeEvent", number*60*1000);
-						e.commit();
-						alarmActivated.setText(getString(R.string.LANG_ALARMENABLED));
-						dialog.dismiss();
-						alarm_penetrant.setEnabled(true);
-						alarm_spinner.setEnabled(alarm_cursor != null);
-						if(!mainActivity.saveFile.getBoolean("alarmPenetrantModeWarning", false) && alarm_penetrant.isChecked()){
-							AlertDialog.Builder b = new AlertDialog.Builder(settingsActivity.this);
-							b.setTitle(R.string.LANG_WARNING);
-							b.setMessage(R.string.LANG_PENETRANTMODEWARNING);
-							b.setPositiveButton(R.string.LANG_OK, new DialogInterface.OnClickListener() {
-								
-								public void onClick(DialogInterface dialog, int which) {
-									Editor e = mainActivity.saveFile.edit();
-									e.putBoolean("alarmPenetrantModeWarning", true);
-									e.commit();
-									dialog.dismiss();
-								}
-							});
-							b.show();
-						}
-					}
-				});
-				adb.setNegativeButton(R.string.LANG_DISABLE, new DialogInterface.OnClickListener() {
-					
-					public void onClick(DialogInterface dialog, int which) {
-						Editor e = mainActivity.saveFile.edit();
-						e.putLong("alarmtimeBeforeEvent", -1);
-						e.commit();
-						alarmActivated.setText(getString(R.string.LANG_ALARMDISABLED));
-						dialog.dismiss();
-						alarm_penetrant.setEnabled(false);
-						alarm_spinner.setEnabled(false);
-					}
-				});
-				adb.show();
-			}
+		final ToggleButton alarmActivated = (ToggleButton) this.findViewById(R.id.alarmActivated);
+		alarmActivated.setChecked(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) > -1);
+		alarmActivated.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if(isChecked){
+					AlertDialog.Builder adb = new AlertDialog.Builder(settingsActivity.this);
+					adb.setMessage(R.string.LANG_ALARMDIALOGTEXT);
+					adb.setTitle(R.string.LANG_ALARMDIALOGTITLE);
+					final EditText tf = new EditText(settingsActivity.this);
+					adb.setView(tf);
+					tf.setKeyListener(new DigitsKeyListener());
+					tf.setText(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", 20*60*1000)/(60*1000)+"");
+					adb.setPositiveButton(R.string.LANG_SAVE, new android.content.DialogInterface.OnClickListener(){
+
+						public void onClick(DialogInterface dialog, int which) {
+							Editor e = mainActivity.saveFile.edit();
+							e.putLong("alarmtimeBeforeEvent", Long.parseLong(tf.getText().toString()));
+							e.commit();
+							dialog.dismiss();
+							alarm_penetrant.setEnabled(true);
+							alarm_spinner.setEnabled(true);
+						}
+						
+					});
+					adb.setOnCancelListener(new DialogInterface.OnCancelListener() {
+						
+						public void onCancel(DialogInterface dialog) {
+							alarmActivated.setChecked(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) > -1);
+							dialog.dismiss();
+						}
+					});
+					adb.create().show();
+				} else {
+					Editor e = mainActivity.saveFile.edit();
+					e.putLong("alarmtimeBeforeEvent", -1);
+					e.commit();
+					alarm_penetrant.setEnabled(false);
+					alarm_spinner.setEnabled(false);
+				}
+			}
 		});
 		// Penetranter Modus Button
 		alarm_penetrant.setChecked(mainActivity.saveFile.getBoolean("alarmPenetrantMode", true));
@@ -184,7 +204,8 @@ public class settingsActivity extends Activity {
 		} else
 			music.add(getString(R.string.LANG_NOSOUNDSFOUND));
 		ArrayAdapter<String> alarm_spinner_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,music);
-		alarm_spinner.setEnabled(alarm_cursor != null && alarm_cursor.getCount() > 0);
+		alarm_spinner.setEnabled(alarm_cursor != null && alarm_cursor.getCount() > 0 && alarmActivated.isChecked());
+		alarmActivated.setEnabled(alarm_cursor != null && alarm_cursor.getCount() > 0);
 		alarm_spinner.setAdapter(alarm_spinner_adapter);
 		if(current != 0)
 			alarm_spinner.setSelection(current);
@@ -206,12 +227,139 @@ public class settingsActivity extends Activity {
 			
 		});
 		
+		// Advanced Schedule Editor
+		final TextView advsen = (TextView) this.findViewById(R.id.about_advandced_schedule_editor);
+		advsen.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				advsen.setVisibility(View.GONE);
+			}
+			
+		});
+		analyseEvents();
+		((Button) this.findViewById(R.id.advanced_schedule_add)).setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				mainActivity.database.execSQL("insert or replace into schedule (time, length, title, room, docent, week, egroup, type) values" +
+						"("+24*60*60+","+90*60+",\"\",\"\",\"\","+FHSSchedule.EVENT_RYTHM_WEEKLY+",0,"+FHSSchedule.EVENT_LECTURE+")");
+				settingsActivity.this.analyseEvents();
+			}
+		});
 	}
 	
 	public void onDestroy(){
 		if(alarm_cursor != null)
 			alarm_cursor.close();
+		if(plan_cursor != null)
+			plan_cursor.close();
 		super.onDestroy();
+	}
+	
+	@SuppressLint({ "ParserError", "ParserError", "ParserError" })
+	public void analyseEvents(){
+		if(plan_cursor != null)
+			plan_cursor.close();
+		plan_cursor = mainActivity.database.rawQuery("select * from schedule order by time asc",null);
+		plan_cursor.moveToFirst();
+		LayoutInflater layoutifl = this.getLayoutInflater();
+		LinearLayout parent = (LinearLayout) this.findViewById(R.id.advanced_schedule_list);
+		parent.removeAllViews();
+		while(!plan_cursor.isAfterLast()){
+			TextView tv = (TextView) layoutifl.inflate(R.layout.listelement,null);
+			int day_ = plan_cursor.getInt(plan_cursor.getColumnIndex("time"))/(24*60*60)-1;
+			short week = plan_cursor.getShort(plan_cursor.getColumnIndex("week"));
+			String day = DAYS[day_] + (week != FHSSchedule.EVENT_RYTHM_WEEKLY ? (FHSSchedule.EVENT_RYTHM_EVEN == week ? " (even)" : " (odd)"):"");
+			long hour = (plan_cursor.getLong(plan_cursor.getColumnIndex("time"))-(day_+1)*24*60*60)/(60*60);
+			long min = (plan_cursor.getLong(plan_cursor.getColumnIndex("time"))-(day_+1)*24*60*60-hour*60*60)/60;
+			tv.setText(String.format("%s,%02d:%02d %s", day, hour, min, plan_cursor.getString(plan_cursor.getColumnIndex("title"))));
+			tv.setTag(plan_cursor.getPosition());
+			tv.setOnClickListener(new OnClickListener() {
+				
+				public void onClick(View v) {
+					plan_cursor.moveToPosition((Integer) v.getTag());
+					final Dialog d = new Dialog(settingsActivity.this);
+					d.setContentView(R.layout.eventeditor);
+					d.setTitle(R.string.LANG_ASE_EVENTEDITOR);
+					final String title = plan_cursor.getString(plan_cursor.getColumnIndex("title"));
+					final TextView ctrl_title = (TextView) d.findViewById(R.id.ase_title);
+					ctrl_title.setText(title);
+					final TextView ctrl_docent = (TextView) d.findViewById(R.id.ase_docent);
+					ctrl_docent.setText(plan_cursor.getString(plan_cursor.getColumnIndex("docent")));
+					final Spinner ctrl_weekday = (Spinner) d.findViewById(R.id.ase_day);
+					ctrl_weekday.setAdapter(new ArrayAdapter<String>(settingsActivity.this,android.R.layout.simple_spinner_item,DAYS));
+					final int time = plan_cursor.getInt(plan_cursor.getColumnIndex("time"));
+					int day = time/(24*60*60)-1;
+					int hour = (time-(day+1)*24*60*60)/(60*60);
+					int min = (time-(day+1)*24*60*60-hour*60*60)/60;
+					ctrl_weekday.setSelection(time/(24*60*60)-1);
+					final CheckBox ctrl_evenweek = (CheckBox) d.findViewById(R.id.ase_evenweek);
+					ctrl_evenweek.
+						setChecked(FHSSchedule.EVENT_RYTHM_EVEN == (plan_cursor.getShort(plan_cursor.getColumnIndex("week")) & FHSSchedule.EVENT_RYTHM_EVEN));
+					final CheckBox ctrl_oddweek = (CheckBox) d.findViewById(R.id.ase_oddweek);
+					ctrl_oddweek.
+						setChecked(FHSSchedule.EVENT_RYTHM_ODD == (plan_cursor.getShort(plan_cursor.getColumnIndex("week")) & FHSSchedule.EVENT_RYTHM_ODD));
+					final TextView ctrl_time = (TextView) d.findViewById(R.id.ase_time);
+					ctrl_time.setText(String.format("%02d:%02d", hour, min));
+					final TextView ctrl_length = (TextView) d.findViewById(R.id.ase_length);
+					ctrl_length.setText(plan_cursor.getInt(plan_cursor.getColumnIndex("length"))+"");
+					final TextView ctrl_room = (TextView) d.findViewById(R.id.ase_room);
+					ctrl_room.setText(plan_cursor.getString(plan_cursor.getColumnIndex("room")));
+					final short group = plan_cursor.getShort(plan_cursor.getColumnIndex("egroup"));
+					final TextView ctrl_group = (TextView) d.findViewById(R.id.ase_group);
+					ctrl_group.setText(group+"");
+					final RadioGroup ctrl_type = (RadioGroup) d.findViewById(R.id.ase_type);
+					ctrl_type.check(plan_cursor.getShort(plan_cursor.getColumnIndex("type")) == FHSSchedule.EVENT_LECTURE ? R.id.ase_rad_lecture : R.id.ase_rad_exercise);
+					((Button) d.findViewById(R.id.ase_save)).setOnClickListener(new OnClickListener() {
+						
+						public void onClick(View v) {
+							Pattern text_pattern = Pattern.compile("^[^\n\r\t\"]+$");
+							Pattern time_pattern = Pattern.compile("^((([0-1]?[0-9]|2[0-3]):[0-5]?[0-9])|((0?[0-9]|1[0-2]):[0-5]?[0-9]\\s?[ap]m))$");
+							if(text_pattern.matcher(ctrl_title.getText()).matches() && // Title
+									text_pattern.matcher(ctrl_docent.getText()).matches() && //Docent
+									text_pattern.matcher(ctrl_room.getText()).matches() && //Room
+									(ctrl_evenweek.isChecked() || ctrl_oddweek.isChecked()) && //Minimum week-requirement
+									time_pattern.matcher(ctrl_time.getText()).matches()){
+								String tc_text = ctrl_time.getText().toString();
+								int new_time = (ctrl_weekday.getSelectedItemPosition()+1)*24*60*60 + 
+										Integer.parseInt(tc_text.substring(0, tc_text.indexOf(":")))*60*60 +
+										Integer.parseInt(tc_text.substring(tc_text.indexOf(":")+1))*60 +
+										(tc_text.endsWith("pm") ? 12*60*60 : 0);
+								mainActivity.database.execSQL("update schedule set " +
+										"time = "+new_time+", " +
+										"length = "+(ctrl_length.getText().length() == 0 ? 90*60 : Integer.parseInt(ctrl_length.getText().toString()))+","+
+										"egroup = "+(ctrl_group.getText().length() == 0 ? 0 : Integer.parseInt(ctrl_group.getText().toString()))+","+
+										"week = "+((ctrl_evenweek.isChecked() ? FHSSchedule.EVENT_RYTHM_EVEN : 0)|(ctrl_oddweek.isChecked() ? FHSSchedule.EVENT_RYTHM_ODD : 0))+","+
+										"room = \""+ctrl_room.getText().toString()+"\","+
+										"title = \""+ctrl_title.getText().toString()+"\","+
+										"docent = \""+ctrl_docent.getText()+"\","+
+										"type = "+(ctrl_type.getCheckedRadioButtonId() == R.id.ase_rad_lecture ? FHSSchedule.EVENT_LECTURE : FHSSchedule.EVENT_EXERCISE)+" "+
+										"where time = "+time+" and title = \""+title+"\" and egroup = "+group);
+								d.dismiss();
+								settingsActivity.this.analyseEvents();
+								try {
+									settingsActivity.this.analyseScheduleForGroups();
+								} catch (JSONException e) {}
+							} else
+								Toast.makeText(settingsActivity.this, R.string.LANG_INVALIDINPUT, Toast.LENGTH_LONG).show();
+						}
+					});
+					((Button) d.findViewById(R.id.ase_delete)).setOnClickListener(new OnClickListener() {
+						
+						public void onClick(View v) {
+							mainActivity.database.execSQL("delete from schedule where time = "+time+" and title = \""+title+"\" and egroup = "+group);
+							d.dismiss();
+							settingsActivity.this.analyseEvents();
+							try {
+								settingsActivity.this.analyseScheduleForGroups();
+							} catch (JSONException e) {}
+						}
+					});
+					d.show();
+				}
+			});
+			parent.addView(tv);
+			plan_cursor.moveToNext();
+		}
 	}
 	
 	public void analyseScheduleForGroups() throws JSONException{
@@ -246,7 +394,7 @@ public class settingsActivity extends Activity {
 						TextView curtv = (TextView) v; 
 						final Dialog d = new Dialog(settingsActivity.this);
 						d.setContentView(R.layout.groupdialog);
-						d.setTitle("Gruppe ändern");
+						d.setTitle("Gruppe Ändern");
 						final EditText et = (EditText) d.findViewById(R.id.groupInput);
 						final TextView tv = (TextView) d.findViewById(R.id.groupDesc);
 						final Button ok = (Button) d.findViewById(R.id.saveGroup);
@@ -302,6 +450,7 @@ public class settingsActivity extends Activity {
 					try {
 						analyseScheduleForGroups();
 					} catch(Exception e1){}
+					analyseEvents();
 					pd.dismiss();
 				} else 
 					throw new Exception();

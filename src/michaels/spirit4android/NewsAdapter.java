@@ -59,27 +59,22 @@ public class NewsAdapter implements ListAdapter {
 		}
 	}
 	
-	@Override
 	public int getCount() {
 		return contents.size();
 	}
 
-	@Override
 	public Object getItem(int arg0) {
 		return content_titles.get(arg0);
 	}
 
-	@Override
 	public long getItemId(int arg0) {
 		return contents.get(arg0);
 	}
 
-	@Override
 	public int getItemViewType(int arg0) {
 		return 0;
 	}
 
-	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
 		TextView tv = (TextView)arg1;
 		if(tv == null){
@@ -90,37 +85,30 @@ public class NewsAdapter implements ListAdapter {
 		return tv;
 	}
 
-	@Override
 	public int getViewTypeCount() {
 		return 1;
 	}
 
-	@Override
 	public boolean hasStableIds() {
 		return false;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return contents.isEmpty();
 	}
 
-	@Override
 	public void registerDataSetObserver(DataSetObserver arg0) {
 		observers.add(arg0);
 	}
 
-	@Override
 	public void unregisterDataSetObserver(DataSetObserver arg0) {
 		observers.remove(arg0);
 	}
 
-	@Override
 	public boolean areAllItemsEnabled() {
 		return true;
 	}
 
-	@Override
 	public boolean isEnabled(int arg0) {
 		return true;
 	}

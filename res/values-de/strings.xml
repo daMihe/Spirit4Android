@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">Spirit</string>
     <string name="LANG_NOSOUNDSFOUND">Keine Sounds auf der SD-Karte gefunden</string>
@@ -46,7 +46,7 @@
 	<string name="LANG_DENYINGLICENSE">Habe ich nicht gelesen, nicht verstanden, lehne die Bedingungen ab oder will ich nicht lesen.</string>
 	<string name="LANG_MENU_UPDATENEWS">News-Update starten</string>
 	<string name="LANG_MENU_UPDATEINFO">News-Update-Info</string>
-	<string name="LANG_MENU_SETTINGS">Stundenplan-Einstellungen</string>
+	<string name="LANG_MENU_SETTINGS">Einstellungen</string>
 	<string name="LANG_MENU_ABOUT">Über Spirit4Android</string>
 	<string name="LANG_ALARMENABLED">Erinnerung ist aktiviert</string>
 	<string name="LANG_ALARMDISABLED">Erinnerung ist deaktiviert</string>
@@ -56,4 +56,20 @@
 	<string name="LANG_ALARMDIALOGTEXT">Bitte setzen Sie die Zeit (in Minuten) fest, die Sie vor dem nächsten Event errinnert werden möchten:</string>
 	<string name="LANG_WRITTENBYFOR">geschrieben von %1$s am %2$s an %3$s</string>
 	<string name="LANG_ALLSEMESTERS">alle Semester</string>
+	<string name="LANG_EXTENDEDSCHEDULEEDITOR_TEXT">Das ist der erweiterte Stundenplan-Editor. Hier können Sie Ihren Stundenplan detailliert bearbeiten. Es ist durchaus wahrscheinlich, dass Sie hier zudem noch Veranstaltungen anderer Gruppen finden. Bitte bedenken: Die normalen Stundenplan-Einstellungen überscheiben diese Einstellungen und anders herum.</string>
+	<string name="LANG_SETTINGS_SIMPLE">Einfache Einst.</string>
+	<string name="LANG_SETTINGS_ALARM">Wecker</string>
+	<string name="LANG_SETTINGS_ADVANCEDSCHEDULEEDITOR">Erw. Stundenplan-Editor</string>
+	<string name="LANG_CANCEL">Abbrechen</string>
+	<string name="LANG_ASE_TITLE">Titel</string>
+	<string name="LANG_ASE_DOCENT">Dozent</string>
+	<string name="LANG_ASE_DAY">Wochentag</string>
+	<string name="LANG_ASE_ODDWEEKS">ungerade Wochen</string>
+	<string name="LANG_ASE_EVENWEEKS">gerade Wochen</string>
+	<string name="LANG_ASE_TIME">Anfangszeit</string>
+	<string name="LANG_ASE_LENGTH">Länge (Sec.)</string>
+	<string name="LANG_ASE_ROOM">Raum</string>
+	<string name="LANG_ASE_GROUP">Gruppe</string>
+	<string name="LANG_ASE_EVENTEDITOR">Event bearbeiten</string>
+	<string name="LANG_DELETE">löschen</string>
 </resources>

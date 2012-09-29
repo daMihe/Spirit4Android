@@ -3,6 +3,10 @@ Changelog for Spirit4Android
 Planned for future (priority from top to bottom)
 - Add Homescreen-Widget
 - Add Spare-Time
+- Add Event-Manager (for adding and removing events manually)
+
+Found Bugs (will be fixed in 0.7)
+- After starting a manual news-update, scrolling is not possible
 
 Version 0.7
 - Fixed Bug: Alarm is now starting at right time. (maybe this bug existed only 

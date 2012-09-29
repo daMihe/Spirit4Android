@@ -176,7 +176,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 		p.getTextBounds(longestString, 0, longestString.length(), r);
 		textSize = p.getTextSize();
 		this.setMeasuredDimension(width, (0-((int)p.ascent())+(int)p.descent())*(count += (count == 0 ? 2 : 1))+(count-1));
-	}
+	} 
 
 	public boolean onTouch(View v, MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN){

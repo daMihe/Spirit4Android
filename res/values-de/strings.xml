@@ -71,5 +71,18 @@
 	<string name="LANG_ASE_ROOM">Raum</string>
 	<string name="LANG_ASE_GROUP">Gruppe</string>
 	<string name="LANG_ASE_EVENTEDITOR">Event bearbeiten</string>
+	<string name="LANG_ASE_ALREADYCREATED">Es existiert schon ein leeres Element (Sonntag 0:00).</string>
 	<string name="LANG_DELETE">löschen</string>
+	<string-array name="LANG_WEEKDAYS_SHORT">
+		<item >So</item>
+		<item >Mo</item>
+		<item >Di</item>
+		<item >Mi</item>
+		<item >Do</item>
+		<item >Fr</item>
+		<item >Sa</item>
+	</string-array>
+	<string name="LANG_WEEK_ODD">ungerade</string>
+	<string name="LANG_WEEK_EVEN">gerade</string>
+	<string name="LANG_WEEK_SHORT">KW</string>
 </resources>

@@ -71,5 +71,18 @@
 	<string name="LANG_ASE_ROOM">room</string>
 	<string name="LANG_ASE_GROUP">groupnumber</string>
 	<string name="LANG_ASE_EVENTEDITOR">Event-editor</string>
+	<string name="LANG_ASE_ALREADYCREATED">There is already an empty event (Sunday 0:00).</string>
 	<string name="LANG_DELETE">delete</string>
+	<string-array name="LANG_WEEKDAYS_SHORT">
+		<item >Su</item>
+		<item >Mo</item>
+		<item >Tu</item>
+		<item >We</item>
+		<item >Th</item>
+		<item >Fr</item>
+		<item >Sa</item>
+	</string-array>
+	<string name="LANG_WEEK_ODD">odd</string>
+	<string name="LANG_WEEK_EVEN">even</string>
+	<string name="LANG_WEEK_SHORT">CW</string>
 </resources>

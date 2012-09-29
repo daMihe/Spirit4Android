@@ -4,7 +4,10 @@ Planned for future (priority from top to bottom)
 - Add Homescreen-Widget
 - Add Spare-Time
 
-Version 0.7 (no binary currently released)
+Version 0.7
+- Fixed Bug: Alarm is now starting at right time. (maybe this bug existed only 
+  in Build 365)
+- UI changed: Added current calendar week
 - Fixed Bug: Scrolling the news-list is now possible after starting a news-
   update, too.
 - Implemented the Advanced-Schedule-Editor 

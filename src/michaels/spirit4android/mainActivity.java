@@ -95,6 +95,7 @@ public class mainActivity extends Activity {
 		
 		//Oberfläche
 		this.setContentView(R.layout.main);
+		((TextView)this.findViewById(R.id.news_week)).setText(this.getString(R.string.LANG_WEEK_SHORT)+" "+Calendar.getInstance().get(Calendar.WEEK_OF_YEAR));
 		
 		// Bereite News-Listen-Adpater für die Verwendung vor
 		news_list_adapter = new NewsAdapter(this,database);

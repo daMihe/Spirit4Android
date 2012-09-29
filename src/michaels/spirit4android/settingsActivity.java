@@ -49,9 +49,9 @@ import android.widget.ToggleButton;
 
 public class settingsActivity extends Activity {
 	
-	static final String[] DAYS = new String[]{
+	/*static final String[] DAYS = new String[]{
 		"Su","Mo","Tu","We","Th","Fr","Sa"
-	};
+	};*/
 	
 	HashMap<String,Integer> groups = new HashMap<String,Integer>();
 	DefaultHttpClient client = new DefaultHttpClient();
@@ -144,7 +144,7 @@ public class settingsActivity extends Activity {
 
 						public void onClick(DialogInterface dialog, int which) {
 							Editor e = mainActivity.saveFile.edit();
-							e.putLong("alarmtimeBeforeEvent", Long.parseLong(tf.getText().toString()));
+							e.putLong("alarmtimeBeforeEvent", Long.parseLong(tf.getText().toString())*60*1000);
 							e.commit();
 							dialog.dismiss();
 							alarm_penetrant.setEnabled(true);
@@ -240,9 +240,16 @@ public class settingsActivity extends Activity {
 		((Button) this.findViewById(R.id.advanced_schedule_add)).setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				mainActivity.database.execSQL("insert or replace into schedule (time, length, title, room, docent, week, egroup, type) values" +
-						"("+24*60*60+","+90*60+",\"\",\"\",\"\","+FHSSchedule.EVENT_RYTHM_WEEKLY+",0,"+FHSSchedule.EVENT_LECTURE+")");
-				settingsActivity.this.analyseEvents();
+				Cursor c = mainActivity.database.rawQuery("select time from schedule where time = 86400 and length = 5400 and title = \"\" and " +
+						"room = \"\" and docent = \"\" and week = "+FHSSchedule.EVENT_RYTHM_WEEKLY+" and egroup = 0 and type = "+FHSSchedule.EVENT_LECTURE, null);
+				if(c.getCount() == 0){
+					mainActivity.database.execSQL("insert or replace into schedule (time, length, title, room, docent, week, egroup, type) values" +
+							"("+24*60*60+","+90*60+",\"\",\"\",\"\","+FHSSchedule.EVENT_RYTHM_WEEKLY+",0,"+FHSSchedule.EVENT_LECTURE+")");
+					settingsActivity.this.analyseEvents();
+				} else {
+					Toast.makeText(settingsActivity.this,R.string.LANG_ASE_ALREADYCREATED,Toast.LENGTH_LONG).show();
+				}
+				c.close();
 			}
 		});
 	}
@@ -268,7 +275,7 @@ public class settingsActivity extends Activity {
 			TextView tv = (TextView) layoutifl.inflate(R.layout.listelement,null);
 			int day_ = plan_cursor.getInt(plan_cursor.getColumnIndex("time"))/(24*60*60)-1;
 			short week = plan_cursor.getShort(plan_cursor.getColumnIndex("week"));
-			String day = DAYS[day_] + (week != FHSSchedule.EVENT_RYTHM_WEEKLY ? (FHSSchedule.EVENT_RYTHM_EVEN == week ? " (even)" : " (odd)"):"");
+			String day = this.getResources().getStringArray(R.array.LANG_WEEKDAYS_SHORT)[day_] + (week != FHSSchedule.EVENT_RYTHM_WEEKLY ? " ("+this.getString(FHSSchedule.EVENT_RYTHM_EVEN == week ?  R.string.LANG_WEEK_EVEN : R.string.LANG_WEEK_ODD)+")":"");
 			long hour = (plan_cursor.getLong(plan_cursor.getColumnIndex("time"))-(day_+1)*24*60*60)/(60*60);
 			long min = (plan_cursor.getLong(plan_cursor.getColumnIndex("time"))-(day_+1)*24*60*60-hour*60*60)/60;
 			tv.setText(String.format("%s,%02d:%02d %s", day, hour, min, plan_cursor.getString(plan_cursor.getColumnIndex("title"))));
@@ -286,7 +293,7 @@ public class settingsActivity extends Activity {
 					final TextView ctrl_docent = (TextView) d.findViewById(R.id.ase_docent);
 					ctrl_docent.setText(plan_cursor.getString(plan_cursor.getColumnIndex("docent")));
 					final Spinner ctrl_weekday = (Spinner) d.findViewById(R.id.ase_day);
-					ctrl_weekday.setAdapter(new ArrayAdapter<String>(settingsActivity.this,android.R.layout.simple_spinner_item,DAYS));
+					ctrl_weekday.setAdapter(new ArrayAdapter<String>(settingsActivity.this,android.R.layout.simple_spinner_item,settingsActivity.this.getResources().getStringArray(R.array.LANG_WEEKDAYS_SHORT)));
 					final int time = plan_cursor.getInt(plan_cursor.getColumnIndex("time"));
 					int day = time/(24*60*60)-1;
 					int hour = (time-(day+1)*24*60*60)/(60*60);
@@ -362,7 +369,7 @@ public class settingsActivity extends Activity {
 		}
 	}
 	
-	public void analyseScheduleForGroups() throws JSONException{
+	public void analyseScheduleForGroups() throws JSONException {
 		groups.clear();
 		ArrayList<String> array4list = new ArrayList<String>();
 		

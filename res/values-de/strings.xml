@@ -5,7 +5,7 @@
     <string name="LANG_RANDOMSOUND">Zufällige Sound-Datei</string>
     <string name="LANG_EVENTREMINDING">Event-Erinnerung</string>
     <string name="LANG_SPIRITFORANDROID">Spirit für Android</string>
-    <string name="LANG_ABOUTTEXT">Programmiert von Michael Wodniok.\nBugs und Anregungen an michix5d@gmail.com. Beschimpfungen und destruktive Kritik bitte an irgendwen anderes schicken.\n\nEntwicklung in Zusammenarbeit mit dem PaDS-Lab der FH Schmalkalden. Danke an Stefan Kunze (Alias: kunze) und Marcus Denison (Alias: fattrat) für die Entwicklung der REST-Schnittstelle und der Spirit-Plattform ohne die eine Android-App deutlich schwerer zu schreiben bzw. sogar unmöglich wäre. Vielen Dank auch an Lynus Apel, Michael Dragunski, Philip Ekert und Siegmund Wodniok für Alltagstests (im Normalen Gebrauch).\n\nVerwendete Tools:\n- Eclipse\n- OpenJDK 7\n- Eclipse JDT\n- Eclipse ADT\n- Android SDK Rev. 14\n- Inkscape</string>
+    <string name="LANG_ABOUTTEXT">Programmiert von Michael Wodniok.\nBugs und Anregungen an michix5d@gmail.com. Beschimpfungen und destruktive Kritik bitte an irgendwen anderes schicken.\n\nEntwicklung in Zusammenarbeit mit dem PaDS-Lab der FH Schmalkalden. Danke an Stefan Kunze (Alias: kunze) und Marcus Denison (Alias: fattrat) für die Entwicklung der REST-Schnittstelle und der Spirit-Plattform ohne die eine Android-App deutlich schwerer zu schreiben bzw. sogar unmöglich wäre. Dank ebenfalls an "Wachhund Skytower" für den Eintrag im Play-Store sowie an Lynus Apel, Michael Dragunski, Philip Ekert und Siegmund Wodniok für Alltagstests (im Normalen Gebrauch).\n\nVerwendete Tools:\n- Eclipse Juno\n- Oracle JDK 7\n- Eclipse JDT\n- Eclipse ADT\n- Android SDK Rev. 20\n- Inkscape</string>
 	<string name="LANG_SAVE">Speichern</string>
 	<string name="LANG_NEWS">Nachrichten:</string>
 	<string name="LANG_SETTINGSCLASSDESCRIPTION">Für einen regulären Stundenplan ist die Angabe Deines Studienganges mit Semester notwendig:</string>
@@ -33,6 +33,9 @@
 	<string name="LANG_CLICKTOGETBACK">Hier "klicken" um zurück zum Countdown zu kommen&#8230;</string>
 	<string name="LANG_LECTURE">Vorlesung</string>
 	<string name="LANG_EXERCISE">Übung</string>
+	<string name="LANG_LECTURE_S">V</string>
+	<string name="LANG_EXERCISE_S">Ü</string>
+	<string name="LANG_SHORT_EVENT_STYLE">abgekürzte Veranstaltungsanzeige</string>
 	<string name="LANG_ALARMTEXT">%1$s\n%2$s\nin %3$s um %4$02d:%5$02d</string>
 	<string name="LANG_DOWNLOADING">Herunterladen&#8230;</string>
 	<string name="LANG_ANALYSING">Analysieren&#8230;</string>
@@ -85,4 +88,5 @@
 	<string name="LANG_WEEK_ODD">ungerade</string>
 	<string name="LANG_WEEK_EVEN">gerade</string>
 	<string name="LANG_WEEK_SHORT">KW</string>
+	<string name="LANG_ALARMENABLED_SHORT">Erinnerung aktiv</string>
 </resources>

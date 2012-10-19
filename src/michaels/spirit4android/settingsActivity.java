@@ -252,6 +252,17 @@ public class settingsActivity extends Activity {
 				c.close();
 			}
 		});
+		
+		CheckBox ses_check = (CheckBox) this.findViewById(R.id.short_style);
+		ses_check.setChecked(mainActivity.saveFile.getBoolean("shortEventDisplay", false));
+		ses_check.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Editor e = mainActivity.saveFile.edit();
+				e.putBoolean("shortEventDisplay", isChecked);
+				e.commit();
+			}
+		});
 	}
 	
 	public void onDestroy(){

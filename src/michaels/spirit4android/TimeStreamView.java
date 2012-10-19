@@ -49,6 +49,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 		Event[] events = schedule.getEventsAtDay(day);
 		int heightOfStripe = ((this.getHeight()-events.length)/(events.length+1));
 		p.setTextSize(textSize);
+		boolean ses = mainActivity.saveFile.getBoolean("shortEventDisplay", false);
 		
 		for(int i=0; i<events.length; i++){
 			Event jso = events[i];
@@ -62,7 +63,7 @@ public class TimeStreamView extends View implements OnTouchListener{
 			String toWrite = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
 						current.get(Calendar.MINUTE))+
 					"/"+jso.room+": "+jso.title+" ("+
-						context.getString(jso.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
+						context.getString(jso.type == FHSSchedule.EVENT_LECTURE ? (ses ? R.string.LANG_LECTURE_S : R.string.LANG_LECTURE) : (ses ? R.string.LANG_EXERCISE_S : R.string.LANG_EXERCISE))+")";
 			g.drawText(toWrite, 0, end-p.descent(), p);
 			current.set(Calendar.DAY_OF_YEAR, day.get(Calendar.DAY_OF_YEAR));
 			if(current.before(Calendar.getInstance())){
@@ -154,10 +155,11 @@ public class TimeStreamView extends View implements OnTouchListener{
 		for(Event currentEvent:objects){
 			count++;
 			Calendar current = schedule.getNextCalendar(currentEvent);
+			boolean ses = mainActivity.saveFile.getBoolean("shortEventDisplay", false);
 			String toMeasure = String.format("%02d:%02d", current.get(Calendar.HOUR_OF_DAY),
 					current.get(Calendar.MINUTE))+
 				"/"+currentEvent.room+": "+currentEvent.title+" ("+
-					context.getString(currentEvent.type == FHSSchedule.EVENT_LECTURE ? R.string.LANG_LECTURE : R.string.LANG_EXERCISE)+")";
+					context.getString(currentEvent.type == FHSSchedule.EVENT_LECTURE ? (ses ? R.string.LANG_LECTURE_S : R.string.LANG_LECTURE) : (ses ? R.string.LANG_EXERCISE_S : R.string.LANG_EXERCISE))+")";
 			Rect r = new Rect();
 			p.getTextBounds(toMeasure, 0, toMeasure.length(), r);
 			if(widthOfLongest < r.width()){

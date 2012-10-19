@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -227,13 +228,16 @@ public class FHSSchedule {
 				JSONObject pre_room = appointment.getJSONObject("location").getJSONObject("place");
 				String room = pre_room.getString("building")+pre_room.getString("room");
 				
+				String title = current.getString("titleShort");
+				title = (Pattern.compile("\\s.$").matcher(title)).replaceFirst("");
+				
 				byte type = (current.getString("eventType").equals("Vorlesung") ? EVENT_LECTURE : EVENT_EXERCISE);
 				
 				String pre_group = current.getString("group").replaceAll("[^0-9]", "");
 				byte group = (pre_group.equals("") ? 0 : Byte.parseByte(pre_group));
 				
 				mainActivity.database.execSQL("INSERT INTO schedule (time, length, egroup, week, room, title, docent, type) VALUES ("+
-				time+","+length+","+group+", "+week+", '"+room+"', '"+current.getString("titleShort")+"', '"+current.getJSONArray("member").getJSONObject(0).getString("name")+"', "+type+")");
+				time+","+length+","+group+", "+week+", '"+room+"', '"+title+"', '"+current.getJSONArray("member").getJSONObject(0).getString("name")+"', "+type+")");
 			}
 		} catch(Exception e){
 			Log.e("FHSSchedule-Parser", "Invalid JSON!");

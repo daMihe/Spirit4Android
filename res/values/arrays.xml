@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="studiengang">
+        <item >---</item>
         <item>bai1</item>
-        <item >bai2</item>
-        <item >bai3</item>
-        <item >bai4</item>
+        <item>bai2</item>
+        <item>bai3</item>
+        <item>bai4</item>
         <item>bai5</item>
         <item>bai6</item>
         <item>bawi1</item>
@@ -29,6 +30,7 @@
         <item>mai2</item>
         <item>mai3</item>
         <item>mai4</item>
+        
     </string-array>
     
 </resources>

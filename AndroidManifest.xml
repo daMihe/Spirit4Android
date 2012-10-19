@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="michaels.spirit4android" android:versionCode="374" android:versionName="0.7 Hammond">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="michaels.spirit4android" android:versionCode="393" android:versionName="0.8 Landry">
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -25,6 +25,12 @@
         </receiver>
         <activity android:permission="android.permission.WAKE_LOCK" android:name="AlarmActivity" android:screenOrientation="portrait"/>
         <service android:name="AlarmService"/>
+        <receiver android:label="Spirit" android:name="HSWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:resource="@xml/hswidget" android:name="android.appwidget.provider"/>
+        </receiver>
 
     </application>
 </manifest>

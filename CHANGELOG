@@ -7,6 +7,7 @@ Version 0.8 Landry (not released yet)
 - Feature added: Homescreen-Widget
 - UI changed: new option to shorten the words "lecture" and "exercise" (in ger-
   man too)
+- Bug fixed: Timezone-Changes will now displayed correctly.
 
 Version 0.7 Hammond
 - Fixed Bug: Alarm is now starting at right time. (maybe this bug existed only 

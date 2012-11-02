@@ -19,7 +19,7 @@
             android:layout_weight="1.0"
             android:text="@string/LANG_ASE_TITLE"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_title"
                 android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
                 android:layout_weight="1.0"
                 android:ems="10"
                 android:inputType="text" >
-
+
                 <requestFocus android:layout_width="wrap_content" />
 
             </EditText>
@@ -38,7 +38,7 @@
             android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_DOCENT"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_docent"
                 android:layout_width="wrap_content"
@@ -61,7 +61,7 @@
             android:id="@+id/tableRow3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_DAY"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <Spinner
                 android:id="@+id/ase_day"
                 android:layout_width="wrap_content"
@@ -82,14 +82,14 @@
             android:id="@+id/tableRow4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <CheckBox
                 android:id="@+id/ase_evenweek"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_EVENWEEKS" />
-
+
             <CheckBox
                 android:id="@+id/ase_oddweek"
                 android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
                 android:text="@string/LANG_ASE_ODDWEEKS" />
 
         </TableRow>
-
+
         <TableRow
             android:id="@+id/tableRow5"
             android:layout_width="wrap_content"
@@ -111,7 +111,7 @@
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_TIME"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_time"
                 android:layout_width="wrap_content"
@@ -126,14 +126,14 @@
             android:id="@+id/tableRow6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_LENGTH"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_length"
                 android:layout_width="wrap_content"
@@ -148,14 +148,14 @@
             android:id="@+id/tableRow7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_ROOM"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_room"
                 android:layout_width="wrap_content"
@@ -170,7 +170,7 @@
             android:id="@+id/tableRow8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
@@ -178,7 +178,7 @@
                 android:layout_weight="1.0"
                 android:text="@string/LANG_ASE_GROUP"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
                 android:id="@+id/ase_group"
                 android:layout_width="wrap_content"
@@ -193,14 +193,14 @@
             android:id="@+id/tableRow9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <RadioGroup
                 android:id="@+id/ase_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:orientation="horizontal" >
-
+
                 <RadioButton
                     android:id="@+id/ase_rad_lecture"
                     android:layout_width="wrap_content"
@@ -208,7 +208,7 @@
                     android:layout_weight="1.0"
                     android:checked="true"
                     android:text="@string/LANG_LECTURE" />
-
+
                 <RadioButton
                     android:id="@+id/ase_rad_exercise"
                     android:layout_width="wrap_content"
@@ -221,14 +221,14 @@
         </TableRow>
         
         <TableRow>
-
+
             <Button
                 android:id="@+id/ase_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:text="@string/LANG_SAVE" />
-
+
             <Button
                 android:id="@+id/ase_delete"
                 android:layout_width="wrap_content"

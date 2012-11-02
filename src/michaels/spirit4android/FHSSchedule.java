@@ -174,12 +174,14 @@ public class FHSSchedule {
 		rtn.set(Calendar.MINUTE, 0);
 		rtn.set(Calendar.SECOND, 0);
 		rtn.set(Calendar.MILLISECOND, 0);
-		rtn.add(Calendar.SECOND, (int) jso.time);
+		rtn.add(Calendar.SECOND,(int) jso.time);
+		// secondary rtn.add is needed because getTimeChangeForWeek needs a time not 0:00 at day
+		rtn.add(Calendar.SECOND,(int) (getTimeChangeForWeek(rtn)/1000));
 		long systime = System.currentTimeMillis();
 		if(rtn.before(Calendar.getInstance()) && (!current || !(rtn.getTimeInMillis() < systime && rtn.getTimeInMillis()+jso.length*1000 > systime))) 
 			rtn.add(Calendar.DAY_OF_YEAR,7);
 		if(((rtn.get(Calendar.WEEK_OF_YEAR)%2+1)&jso.week) == 0)
-			rtn.add(Calendar.DAY_OF_YEAR, 7);
+			rtn.add(Calendar.DAY_OF_YEAR,7);
 		return rtn;
 	}
 	
@@ -242,5 +244,31 @@ public class FHSSchedule {
 		} catch(Exception e){
 			Log.e("FHSSchedule-Parser", "Invalid JSON!");
 		}
+	}
+	
+	public static long getTimeChangeForWeek(Calendar c){
+		/*
+		 * Finds the correction time for weeks, where the timezone in germany 
+		 * changes from CET to CEST. (See "Verordnung vom 12.07.2001")
+		 * The analyzed week is taken from the given Calendar.
+		 */
+		Calendar c_su = (Calendar) c.clone();
+		c_su.add(Calendar.DAY_OF_YEAR, - c_su.get(Calendar.DAY_OF_WEEK));
+		c_su.set(Calendar.HOUR_OF_DAY, 0);
+		c_su.set(Calendar.MINUTE, 0);
+		Calendar c_next_su = (Calendar) c_su.clone();
+		c_next_su.add(Calendar.DAY_OF_YEAR, 7);
+		switch(c_su.get(Calendar.MONTH)){
+			case Calendar.MARCH: 
+				if(c_next_su.get(Calendar.MONTH) != Calendar.MARCH)
+					return - 3600000;
+				break;
+			case Calendar.OCTOBER:
+				if(c_next_su.get(Calendar.MONTH) != Calendar.OCTOBER)
+					return   3600000;
+				break;
+		default: break;
+		}
+		return 0;
 	}
 }

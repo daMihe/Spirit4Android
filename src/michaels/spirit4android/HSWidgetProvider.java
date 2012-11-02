@@ -2,6 +2,7 @@ package michaels.spirit4android;
 
 import java.util.Calendar;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -9,6 +10,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
+
+@SuppressLint("WorldReadableFiles") 
 
 public class HSWidgetProvider extends AppWidgetProvider {
 	@Override
@@ -20,7 +23,7 @@ public class HSWidgetProvider extends AppWidgetProvider {
 		FHSSchedule.Event events[] = schedule.getDaysComingEvents(search_cal);
 		int day = (int)(events[0].time/(24*60*60)-1);
 		if(mainActivity.saveFile == null)
-			mainActivity.saveFile = context.getSharedPreferences("s4apref",context.MODE_WORLD_READABLE);
+			mainActivity.saveFile = context.getSharedPreferences("s4apref",Context.MODE_WORLD_READABLE);
 		String eventList = context.getResources().getStringArray(R.array.LANG_WEEKDAYS_SHORT)[day]+(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) < 0 ? "" : " ("+context.getString(R.string.LANG_ALARMENABLED_SHORT)+")");
 		for(FHSSchedule.Event e : events){
 			short time_hours = (short) ((e.time-24*60*60*(1+day))/(60*60));

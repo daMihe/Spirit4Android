@@ -36,7 +36,7 @@ public class newsActivity extends Activity {
 				who = getString(R.string.LANG_ALLSEMESTERS); 
 			newsDesc.setText(String.format(getString(R.string.LANG_WRITTENBYFOR), c.getString(c.getColumnIndex("author")), DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(c.getLong(c.getColumnIndex("date")))),who));
 			WebView newsDisp = (WebView) this.findViewById(R.id.newsDisp);
-			newsDisp.setBackgroundColor(android.R.color.black);
+			newsDisp.setBackgroundColor(getResources().getColor(android.R.color.black));
 			String html = "";
 			String[] preHTML = c.getString(c.getColumnIndex("content")).split("%\\{");
 			for(String s:preHTML){
@@ -57,8 +57,8 @@ public class newsActivity extends Activity {
 				html = html.replaceFirst("[\\*]{2}", "</strong>");
 			}
 			html = html.replace("\\r\\n", "<br />");
-			html = "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body style=\"color:#fff\">"+html+"</body></html>";
-			newsDisp.loadData(html, "text/html", "UTF-8");
+			html = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /></head><body style=\"color:#fff\">"+html+"</body></html>";
+			newsDisp.loadData(html, "text/html; charset=UTF-8", null);
 		}
 		c.close();		
 	}

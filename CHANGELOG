@@ -1,8 +1,5 @@
 Changelog for Spirit4Android
 
-Planned for future (priority from top to bottom)
-- Add Spare-Time
-
 Version 0.8 Landry (not released yet)
 - Feature added: Homescreen-Widget
 - UI changed: new option to shorten the words "lecture" and "exercise" (in ger-
@@ -10,6 +7,7 @@ Version 0.8 Landry (not released yet)
 - Bug fixed: Timezone-Changes will now displayed correctly.
 - Bug fixed: Non-regular Characters are now displayed correctly in the news-
   view. This bug existed only on devices running Android 4.x
+- Feature added: sparetime (events in sparetime will be ignored)
 
 Version 0.7 Hammond
 - Fixed Bug: Alarm is now starting at right time. (maybe this bug existed only 

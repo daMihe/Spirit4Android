@@ -1,9 +1,13 @@
 package michaels.spirit4android;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
@@ -49,17 +53,16 @@ import android.widget.ToggleButton;
 
 public class settingsActivity extends Activity {
 	
-	/*static final String[] DAYS = new String[]{
-		"Su","Mo","Tu","We","Th","Fr","Sa"
-	};*/
-	
 	HashMap<String,Integer> groups = new HashMap<String,Integer>();
 	DefaultHttpClient client = new DefaultHttpClient();
-	Cursor alarm_cursor;
-	Cursor plan_cursor;
+	Cursor alarm_cursor, plan_cursor, spare_cursor;
 	ProgressDialog pd;
 	
 	public void onCreate(Bundle b){
+		/*
+		 * onCreate - settingsActivity initialization. See Comments for what is
+		 * done here exactly. Android API needs a call to Activity.onCreate.
+		 */
 		super.onCreate(b);
 		this.setContentView(R.layout.settings);
 		
@@ -75,12 +78,19 @@ public class settingsActivity extends Activity {
 		tab_alarm.setContent(R.id.alarm_settings);
 		tab_alarm.setIndicator(getString(R.string.LANG_SETTINGS_ALARM),getResources().getDrawable(R.drawable.settings_alarm));
 		
-		TabSpec tab_advanced = th.newTabSpec("tab3");
+		TabSpec tab_sparetime = th.newTabSpec("tab3");
+		tab_sparetime.setContent(R.id.spare_time_editor);
+		tab_sparetime.setIndicator(getString(R.string.LANG_SETTINGS_SPARETIMEEDITOR),getResources().getDrawable(R.drawable.settings_spare_time));
+		
+		TabSpec tab_advanced = th.newTabSpec("tab4");
 		tab_advanced.setContent(R.id.advanced_plan_editor);
 		tab_advanced.setIndicator(getString(R.string.LANG_SETTINGS_ADVANCEDSCHEDULEEDITOR),getResources().getDrawable(R.drawable.settings_advanced));
 		
+		
+		
 		th.addTab(tab_simple);
 		th.addTab(tab_alarm);
+		th.addTab(tab_sparetime);
 		th.addTab(tab_advanced);
 		
 		// Fill with contents
@@ -124,7 +134,19 @@ public class settingsActivity extends Activity {
 		} catch(Exception e){
 			Log.e("DEBUG",e.getClass().getName()+": "+e.getMessage());
 		}
+
+		CheckBox ses_check = (CheckBox) this.findViewById(R.id.short_style);
+		ses_check.setChecked(mainActivity.saveFile.getBoolean("shortEventDisplay", false));
+		ses_check.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Editor e = mainActivity.saveFile.edit();
+				e.putBoolean("shortEventDisplay", isChecked);
+				e.commit();
+			}
+		});
 		
+		// alarm settings		
 		final Spinner alarm_spinner = (Spinner) this.findViewById(R.id.alarmMedia);
 		final ToggleButton alarm_penetrant = (ToggleButton) this.findViewById(R.id.alarmPenetrant);
 		final ToggleButton alarmActivated = (ToggleButton) this.findViewById(R.id.alarmActivated);
@@ -169,7 +191,7 @@ public class settingsActivity extends Activity {
 				}
 			}
 		});
-		// Penetranter Modus Button
+		// Penetrant Mode Button
 		alarm_penetrant.setChecked(mainActivity.saveFile.getBoolean("alarmPenetrantMode", true));
 		alarm_penetrant.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
@@ -181,7 +203,7 @@ public class settingsActivity extends Activity {
 		});
 		alarm_penetrant.setEnabled(mainActivity.saveFile.getLong("alarmtimeBeforeEvent", -1) >= 0);
 		
-		// MediaSpinner Daten sammeln
+		// search music for alarm
 		ArrayList<String> music = new ArrayList<String>();
 		String[] proj = {
 			MediaStore.Audio.Media.ARTIST,
@@ -190,7 +212,7 @@ public class settingsActivity extends Activity {
 		};
 		alarm_cursor = this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Audio.Media.ARTIST);
 		int current = 0;
-		if(alarm_cursor != null || alarm_cursor.getCount() != 0){
+		if(alarm_cursor != null && alarm_cursor.getCount() != 0){
 			music.add(getString(R.string.LANG_RANDOMSOUND));
 			alarm_cursor.moveToFirst();
 			String alarm_music = mainActivity.saveFile.getString("alarmMusic", "");
@@ -253,14 +275,33 @@ public class settingsActivity extends Activity {
 			}
 		});
 		
-		CheckBox ses_check = (CheckBox) this.findViewById(R.id.short_style);
-		ses_check.setChecked(mainActivity.saveFile.getBoolean("shortEventDisplay", false));
-		ses_check.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		// Sparetime Editor
+		// should sparetime-data be loaded from third-party servers?
+		CheckBox sparetimeload = (CheckBox) this.findViewById(R.id.spare_time_load_from_acl5m);
+		sparetimeload.setChecked(mainActivity.saveFile.getBoolean("loadsparetimefromacl5m", false));
+		sparetimeload.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				// save the new state
 				Editor e = mainActivity.saveFile.edit();
-				e.putBoolean("shortEventDisplay", isChecked);
+				e.putBoolean("loadsparetimefromacl5m", isChecked);
 				e.commit();
+			}
+		});
+		
+		analyseSpareTime();
+		
+		Button sparetimeadd = (Button) this.findViewById(R.id.spare_time_add);
+		sparetimeadd.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				Cursor c = mainActivity.database.rawQuery("select * from sparetime where start = 0 and stop = 0", null);
+				int count = c.getCount();
+				c.close();
+				if(count == 0){
+					mainActivity.database.execSQL("insert into sparetime (desc,start,stop) values (\"new sparetime\",0,0)");
+					settingsActivity.this.analyseSpareTime();
+				}
 			}
 		});
 	}
@@ -270,7 +311,118 @@ public class settingsActivity extends Activity {
 			alarm_cursor.close();
 		if(plan_cursor != null)
 			plan_cursor.close();
+		if(spare_cursor != null)
+			spare_cursor.close();
 		super.onDestroy();
+	}
+	
+	public void analyseSpareTime(){
+		/*
+		 * analyseSpareTime - analyses Sparetime's in database and updating list
+		 * in Sparetime-tab.
+		 */
+		
+		// clear database-cursor and layout
+		if(spare_cursor != null)
+			spare_cursor.close();		
+		LinearLayout spare_layout = (LinearLayout) this.findViewById(R.id.spare_time_list);
+		spare_layout.removeAllViews();
+		
+		// find all sparetime's
+		spare_cursor = mainActivity.database.rawQuery("select desc, start, stop from sparetime order by start asc",null);
+		spare_cursor.moveToFirst();
+		
+		// add them to the UI
+		LayoutInflater inflater = this.getLayoutInflater();
+		while(!spare_cursor.isAfterLast()){
+			TextView inflated = (TextView) inflater.inflate(R.layout.listelement, null);
+			inflated.setText(DateFormat.getDateInstance().format(new Date(spare_cursor.getLong(spare_cursor.getColumnIndex("start"))))+
+					" "+spare_cursor.getString(spare_cursor.getColumnIndex("desc")));
+			inflated.setTag(spare_cursor.getPosition());
+			inflated.setOnClickListener(new OnClickListener() {
+				
+				public void onClick(View v) {
+					/*
+					 * this function is called when a sparetime should be 
+					 * edited. It creates a dialog for it and implements the
+					 * saving and deletion of the sparetime.
+					 */
+					spare_cursor.moveToPosition((Integer) v.getTag());
+					
+					final Dialog dialog = new Dialog(settingsActivity.this);
+					dialog.setContentView(R.layout.sparetimeeditor);
+					
+					final String description = spare_cursor.getString(spare_cursor.getColumnIndex("desc"));
+					
+					final EditText desc = (EditText) dialog.findViewById(R.id.ste_desc);
+					desc.setText(description);
+					
+					final long start = spare_cursor.getLong(spare_cursor.getColumnIndex("start"));
+					final long stop = spare_cursor.getLong(spare_cursor.getColumnIndex("stop"));
+					
+					final EditText start_day = (EditText) dialog.findViewById(R.id.ste_start_day);
+					start_day.setText(DateFormat.getDateInstance().format(new Date(start)));
+					
+					final EditText start_time = (EditText) dialog.findViewById(R.id.ste_start_time);
+					start_time.setText(DateFormat.getTimeInstance().format(new Date(start)));
+					
+					final EditText end_day = (EditText) dialog.findViewById(R.id.ste_end_day);
+					end_day.setText(DateFormat.getDateInstance().format(new Date(stop)));
+					
+					final EditText end_time = (EditText) dialog.findViewById(R.id.ste_end_time);
+					end_time.setText(DateFormat.getTimeInstance().format(new Date(stop)));
+					
+					dialog.setTitle(R.string.LANG_STE_DTITLE);
+					
+					((Button) dialog.findViewById(R.id.ste_save)).setOnClickListener(new OnClickListener() {
+						
+						public void onClick(View v) {
+							DateFormat df = DateFormat.getDateInstance();
+							DateFormat tf = DateFormat.getTimeInstance();
+							try {								
+								long newstart = df.parse(start_day.getEditableText().toString()).getTime() + 
+										tf.parse(start_time.getEditableText().toString()).getTime();
+								newstart += TimeZone.getDefault().getOffset(newstart);
+								long newstop = df.parse(end_day.getEditableText().toString()).getTime() + 
+										tf.parse(end_time.getEditableText().toString()).getTime();
+								newstop += TimeZone.getDefault().getOffset(newstop);
+								// check if end-time is before start-time (if both input can be valid)
+								if(newstop < newstart)
+									throw new ParseException("End-time is before Start-time.", 0);
+								// insert data to the database
+								mainActivity.database.execSQL("update sparetime set desc = ?, start = "+newstart+
+										", stop = "+newstop+" where desc = ? and start = "+start+" and stop = "+stop,
+										new String[]{
+											desc.getEditableText().toString(),
+											description
+								});
+								dialog.dismiss();
+								settingsActivity.this.analyseSpareTime();
+							} catch (ParseException e) {
+								Toast.makeText(settingsActivity.this, R.string.LANG_INVALIDINPUT, Toast.LENGTH_LONG).show();
+							}
+						}
+					});
+					((Button) dialog.findViewById(R.id.ste_delete)).setOnClickListener(new OnClickListener() {
+						public void onClick(View arg0) {
+							
+							mainActivity.database.execSQL("delete from sparetime where desc = ? and start = ? and stop = ?",
+									new Object[]{
+										spare_cursor.getString(spare_cursor.getColumnIndex("desc")),
+										spare_cursor.getLong(spare_cursor.getColumnIndex("start")),
+										spare_cursor.getLong(spare_cursor.getColumnIndex("stop"))
+							});
+							dialog.dismiss();
+							settingsActivity.this.analyseSpareTime();
+						}
+					});
+					
+					dialog.show();
+				}
+			});
+			spare_layout.addView(inflated);
+			spare_cursor.moveToNext();
+		}
 	}
 	
 	@SuppressLint({ "ParserError", "ParserError", "ParserError" })

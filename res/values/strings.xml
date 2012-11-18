@@ -44,7 +44,7 @@
 	<string name="LANG_SCHEDULEDOWNLOADEDSUCCESSFULLY">Schedule successfully refreshed.</string>
 	<string name="LANG_INVALIDINPUT">Invalid input.</string>
 	<string name="LANG_ERRORWHILELOADINGPLAN">A error has been occured while refreshing schedule.\n\n%1$s: %2$s</string>
-	<string name="LANG_LICENSE">Welcome to the Spirit4Android-app. This app loads automatically from the Spirit-platform and shows you an actual schedule for one course. Additionally, there is a built-in alarm-function.\n\nBefore you use the app:\nThe app is under development. Before a version will be released, it will get checked but there is no warranty for a correct working app.\nWhile using the app, it will load data through the internet. This can create costs made by your provider. The app is licensed under CC-BY_SA 3.0. This expicitly allows to copy the app and give it to your friends. More details about licensing are located at www.spirit4android.de.tc (only german)</string>
+	<string name="LANG_LICENSE">Welcome to the Spirit4Android-app. This app loads automatically from the Spirit-platform and shows you an actual schedule for one course. Additionally, there is a built-in alarm-function.\n\nBefore you use the app:\nThe app is under development. Before a version will be released, it will get checked but there is no warranty for a correct working app.\nWhile using the app, it will load data through the internet. This can create costs made by your provider. The app is licensed under CC-BY_SA 3.0. This expicitly allows to copy the app and give it to your friends. More details about licensing are located at acl5m.org (only german)\n\nPrivacy policy:\nThe app does not send any critical data from your phone to any of the used web servers, but the User-Agent contains the display-resolution of your phone and the version of this app for statistical uses.</string>
 	<string name="LANG_ACCEPTLICENSE">i have read, understood the license terms and accept them.</string>
 	<string name="LANG_DENYINGLICENSE">i have not read, not understood, disagree the terms of or dont want to read the license.</string>
 	<string name="LANG_MENU_UPDATENEWS">update news now</string>
@@ -89,4 +89,13 @@
 	<string name="LANG_WEEK_EVEN">even</string>
 	<string name="LANG_WEEK_SHORT">CW</string>
 	<string name="LANG_ALARMENABLED_SHORT">alarm active</string>
+	<string name="LANG_SPARETIMEEDITOR_TEXT">This is the Spare-Time-Editor. In a sparetime, all events will be ignored.</string>
+	<string name="LANG_SETTINGS_SPARETIMEEDITOR">Sparetime-Editor</string>
+	<string name="LANG_SPARETIMELOADFROMACL5M">load pre-defined sparetime from acl5m.org</string>
+	<string name="LANG_STE_DESCRIPTION">description</string>
+	<string name="LANG_STE_STARTDAY">day of start</string>
+	<string name="LANG_STE_STARTTIME">daytime of start</string>
+	<string name="LANG_STE_ENDDAY">day of end</string>
+	<string name="LANG_STE_ENDTIME">daytime of end</string>
+	<string name="LANG_STE_DTITLE">Edit sparetime&#8230;</string>
 </resources>

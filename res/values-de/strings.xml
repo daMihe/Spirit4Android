@@ -44,7 +44,7 @@
 	<string name="LANG_SCHEDULEDOWNLOADEDSUCCESSFULLY">Stundenplan erfolgreich aktualisert.</string>
 	<string name="LANG_INVALIDINPUT">Ungültige Eingabe.</string>
 	<string name="LANG_ERRORWHILELOADINGPLAN">Es gab einen Fehler beim Herunterladen.\n\n%1$s: %2$s</string>
-	<string name="LANG_LICENSE">Willkommen in der Spirit-App für Android. Mit der App werden Sie automatisch über aktuelle Nachrichten von Spirit informiert und können sich Ihren Stundenplan inklusive Erinnerung an deine nächste Veranstaltung holen.\n\nVor der Benutzung:\nDie App ist Entwicklung. Vor jedem Release wird die Software zwar sorgfältig geprüft, eine Garantie, dass sie funktioniert gibt es nicht. In dem Fall können Programmierer keine Verantwortung übernehmen. Rechnen Sie damit.\nEs werden Daten aus dem Internet geladen. Dabei können für Sie Kosten des Betreibers entstehen. Die App ist unter CC-BY_SA 3.0 lizenziert. Eine Weitergabe ist damit ausdrücklich erlaubt. Mehr Details erhalten Sie auf www.spirit4android.de.tc</string>
+	<string name="LANG_LICENSE">Willkommen in der Spirit-App für Android. Mit der App werden Sie automatisch über aktuelle Nachrichten von Spirit informiert und können sich Ihren Stundenplan inklusive Erinnerung an deine nächste Veranstaltung holen.\n\nVor der Benutzung:\nDie App ist Entwicklung. Vor jedem Release wird die Software zwar sorgfältig geprüft, eine Garantie, dass sie funktioniert gibt es nicht. In dem Fall können Programmierer keine Verantwortung übernehmen. Rechnen Sie damit.\nEs werden Daten aus dem Internet geladen. Dabei können für Sie Kosten des Betreibers entstehen. Die App ist unter CC-BY_SA 3.0 lizenziert. Eine Weitergabe ist damit ausdrücklich erlaubt. Mehr Details erhalten Sie auf acl5m.org\n\ndatenschutzbestimmungen:\nDie Anwendung sendet keine persönlichen Daten an einen der verwendeten Server. Es wird jedoch als "User-Agent" die aktuelle Version der Anwendung und die Display-Größe des Geräts mit gesendet.</string>
 	<string name="LANG_ACCEPTLICENSE">Habe ich gelesen, verstanden und akzeptiere die Bedingungen.</string>
 	<string name="LANG_DENYINGLICENSE">Habe ich nicht gelesen, nicht verstanden, lehne die Bedingungen ab oder will ich nicht lesen.</string>
 	<string name="LANG_MENU_UPDATENEWS">News-Update starten</string>
@@ -89,4 +89,13 @@
 	<string name="LANG_WEEK_EVEN">gerade</string>
 	<string name="LANG_WEEK_SHORT">KW</string>
 	<string name="LANG_ALARMENABLED_SHORT">Erinnerung aktiv</string>
+	<string name="LANG_SPARETIMEEDITOR_TEXT">Das ist der Freizeit-Editor. In einer Freizeit, werden sämtliche Veranstaltungen unterdrückt.</string>
+	<string name="LANG_SETTINGS_SPARETIMEEDITOR">Freizeit-Editor</string>
+	<string name="LANG_SPARETIMELOADFROMACL5M">vordefinierte Freizeiten von acl5m.org herunterladen</string>
+	<string name="LANG_STE_DESCRIPTION">Titel</string>
+	<string name="LANG_STE_STARTDAY">Start (Tag)</string>
+	<string name="LANG_STE_STARTTIME">Start (Uhrzeit)</string>
+	<string name="LANG_STE_ENDDAY">Ende (Tag)</string>
+	<string name="LANG_STE_ENDTIME">Ende (Uhrzeit)</string>
+	<string name="LANG_STE_DTITLE">Freizeit bearbeiten&#8230;</string>
 </resources>

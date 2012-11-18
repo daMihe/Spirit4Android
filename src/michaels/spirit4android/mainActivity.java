@@ -40,7 +40,7 @@ public class mainActivity extends Activity {
 	public static String USERAGENT;
 	public static SharedPreferences saveFile;
 	public static JSONObject newsObject = null;
-	public static String preJSON = "";
+	//public static String preJSON = "";
 	public static SQLiteDatabase database = null;
 	public static long last_news_update = 0;
 	boolean pause;
@@ -50,6 +50,10 @@ public class mainActivity extends Activity {
 	static NewsAdapter news_list_adapter;
 	
 	public void onStart(){
+		/*
+		 * onStart - entrypoint of this app. Android API needs the call of
+		 * "super.onStart()". 
+		 */
 		super.onStart();
 		
 		// Setting Useragent: "Spirit4Android v<versionName> (disp <displayWidth>*<displayHeight>)"
@@ -57,12 +61,17 @@ public class mainActivity extends Activity {
 			DisplayMetrics dm = new DisplayMetrics();
 			this.getWindowManager().getDefaultDisplay().getMetrics(dm);
 			PackageInfo pi = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-			USERAGENT = "Spirit4Android v"+pi.versionName+" (disp "+dm.widthPixels+"*"+dm.heightPixels+")";
+			USERAGENT = "Spirit4Android v"+pi.versionName+" (display-size "+dm.widthPixels+"*"+dm.heightPixels+")";
 		} catch(Exception e){
-			USERAGENT = "Spirit4Android";
+			USERAGENT = "Spirit4Android (version or display-metrics not available)";
 		}
+		
+		// Loading Preferences
 		if(saveFile == null)
-			saveFile = this.getSharedPreferences("s4apref",MODE_WORLD_READABLE); //lesen der Einstellungen
+			saveFile = this.getSharedPreferences("s4apref",MODE_WORLD_READABLE);
+		
+		// Checking, if a new semester has started and if yes, showing a dialog 
+		// reminding user to change the semester
 		if(saveFile.getInt("letzterSemesterWechsel", Calendar.getInstance().get(Calendar.MONTH)) != Calendar.getInstance().get(Calendar.MONTH) && (Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER || Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL)){
 			AlertDialog.Builder ab = new AlertDialog.Builder(this);
 			ab.setTitle(R.string.LANG_SEMESTERCHANGE)
@@ -81,6 +90,7 @@ public class mainActivity extends Activity {
 			ab.create().show();
 		}
 		
+		// First initialization: setting last-semester-change for check above.
 		if(!saveFile.contains("letzterSemesterWechsel")){
 			Editor e = saveFile.edit();
 			e.putInt("letzterSemesterWechsel", Calendar.getInstance().get(Calendar.MONTH));
@@ -93,33 +103,48 @@ public class mainActivity extends Activity {
 		// Set last_news_update for dispRefresh
 		last_news_update = saveFile.getLong("lastUpdate", 0);
 		
-		//Oberfläche
+		// Setting and Loading UI
 		this.setContentView(R.layout.main);
 		((TextView)this.findViewById(R.id.news_week)).setText(this.getString(R.string.LANG_WEEK_SHORT)+" "+Calendar.getInstance().get(Calendar.WEEK_OF_YEAR));
 		
-		// Bereite News-Listen-Adpater für die Verwendung vor
+		// Prepare the ListAdapter for the News-List
 		news_list_adapter = new NewsAdapter(this,database);
 		((ListView) this.findViewById(R.id.newsListe)).setAdapter(news_list_adapter);
-		
 		this.refreshNews();
+		
+		// Starting the news-updater delayed (for better performance at start)
 		Handler updateHandler = new Handler();
 		updateHandler.postDelayed(new Updater(),10000);
 	}
 	
 	public void onPause(){
+		/*
+		 * onPause - called when leaving Activity. Android API needs the 
+		 * "super.onPause()"-call.
+		 */
+		
+		// UI updating-handler will be paused.
 		pause = true;
+		
 		super.onPause();
 	}
 	
 	public void onResume(){
+		/*
+		 * onResume - called when reload the Activity. Android API needs the 
+		 * "super.onResume()"-call.
+		 */
+		
+		// refresh schedule
 		schedule = new FHSSchedule(this);
 		
+		// resume UI-updater
 		pause = false;
 		Handler h = new Handler();
 		h.post(new dispRefresh());
 		super.onResume();
 		
-		// AlarmManager
+		// (re-)set AlarmManager for using Alarm
 		setAlarm(this,false);
 	}
 	
@@ -155,20 +180,33 @@ public class mainActivity extends Activity {
 	}
 	
 	public static void openDB(Context c){
+		/*
+		 * openDB - Loads or creates Database (in db are for example schedules,
+		 * news and groups saved.
+		 * Context is needed because SQLite-Databases can only be opened through
+		 * a Context.
+		 */
 		if(database == null)
 			database = c.openOrCreateDatabase("Spirit4Android", Context.MODE_WORLD_READABLE, null);
-		database.execSQL("CREATE TABLE IF NOT EXISTS news (id INTEGER NOT NULL, title TEXT, author TEXT, receivers TEXT, date INTEGER, content TEXT)");
+		database.execSQL("CREATE TABLE IF NOT EXISTS news (id INTEGER NOT NULL UNIQUE, title TEXT, author TEXT, receivers TEXT, date INTEGER, content TEXT)");
 		database.execSQL("CREATE TABLE IF NOT EXISTS schedule (time INTEGER NOT NULL, length INTEGER, title TEXT, docent TEXT, room TEXT, week INTEGER, type INTEGER, egroup INTEGER)");
-		database.execSQL("CREATE TABLE IF NOT EXISTS groups (title TEXT, type INTEGER, egroup INTEGER)");
+		database.execSQL("CREATE TABLE IF NOT EXISTS groups (title TEXT UNIQUE, type INTEGER, egroup INTEGER)");
+		database.execSQL("CREATE TABLE IF NOT EXISTS sparetime (desc TEXT UNNIQUE, start INTEGER, stop INTEGER)");
 		if(saveFile == null)
 			saveFile = c.getSharedPreferences("s4apref",MODE_WORLD_READABLE);
 	}
 
 	public static void setAlarm(Context c, boolean force){
-		// Function to set Alarm. Context is needed for launching activity, function has a dual-calling-prevention.
-		// Set force to true, if you want to set the alarm in any case.
+		/*
+		 * setAlarm - Static Function to set alarm. Context is needed for 
+		 * launching the AlarmActivity and getting the AlarmManager-Service.
+		 * Set force to true if you want to skip the double-set prevention.
+		 */
+		
+		// static function so it is possible that schedule is null.
 		if(schedule == null)
 			schedule = new FHSSchedule(c);
+		
 		long alarm_time_before_event = saveFile.getLong("alarmtimeBeforeEvent", -1);
 		if(alarm_time_before_event > -1 && schedule.length() > 0){
 			PendingIntent pending_intent = PendingIntent.getActivity(c, 0, new Intent(c,AlarmActivity.class), PendingIntent.FLAG_ONE_SHOT);
@@ -190,11 +228,13 @@ public class mainActivity extends Activity {
 				days_events = schedule.getEventsAtDay(current_day);
 			}
 			
+			// if the days has no events or the first event of the day is before now, jump to next day.
 			while(days_events.length == 0 || schedule.getNextCalendar(days_events[0]).before(Calendar.getInstance())){
 				current_day.add(Calendar.DAY_OF_MONTH, 1);
 				days_events = schedule.getEventsAtDay(current_day);
 			}
 			
+			// calculating time of the next alarm, setting alarm and activate double-set prevention
 			long time_to_set = schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event;	
 			if(time_to_set != saveFile.getLong("last_alarm_set", 0) || force){
 				alarmator.set(AlarmManager.RTC_WAKEUP, schedule.getNextCalendar(days_events[0]).getTimeInMillis()-alarm_time_before_event, pending_intent);
@@ -208,6 +248,10 @@ public class mainActivity extends Activity {
 	}
 	
 	public static String MD5(String str){
+		/*
+		 * MD5 - Static function for calculating MD5-Hash of a given String.
+		 * Returns Hexadecimal-Representation of the hash as String.
+		 */
 		try {
 			String rtn = "";
 			MessageDigest md = MessageDigest.getInstance("MD5");
@@ -224,6 +268,10 @@ public class mainActivity extends Activity {
 	}
 	
 	public void refreshNews(){
+		/*
+		 * refreshNews - Refreshes the ListView for displaying updated news from
+		 * the Database.
+		 */
 		ListView news_list = (ListView) this.findViewById(R.id.newsListe);
 		news_list_adapter.updateData();
 		news_list.setOnItemClickListener(new OnItemClickListener() {
@@ -238,18 +286,29 @@ public class mainActivity extends Activity {
 	}
 	
 	class dispRefresh implements Runnable {
-		
 		public void run() {
+			/*
+			 * dispRefresh.run - a function called through a Handler. Refreshes
+			 * the displayed Views. For example, the countdown and the schedule
+			 * view.
+			 */
+			
+			// Don't refresh if activity is not visible!
 			if(!pause){
 				if(mainActivity.schedule.length() == 0){
+					// We've no schedule to show. Show a message to download a
+					// schedule.
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan)).setVisibility(View.VISIBLE);
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.GONE);
 					((TextView)mainActivity.this.findViewById(R.id.countdown)).setVisibility(View.GONE);
 					((TextView)mainActivity.this.findViewById(R.id.nächstesEvent)).setText(R.string.LANG_NOSCHEDULELOADED);
 				} else {
+					// OK, a schedule is available.
 					TextView nevent = (TextView)mainActivity.this.findViewById(R.id.nächstesEvent);
 					((LinearLayout)mainActivity.this.findViewById(R.id.main_plan_alternative)).setVisibility(View.VISIBLE);
-					if(tsv == null || tsv.switchDayAutomatically){							
+					if(tsv == null || tsv.switchDayAutomatically){
+						// we are currently in the mode which shows a countdown
+						// and the next events from now
 						TextView countdown = (TextView)mainActivity.this.findViewById(R.id.countdown);
 						Event c = schedule.getNextEvent();
 						Calendar ccalendar = schedule.getCalendar(c, false);
@@ -277,6 +336,8 @@ public class mainActivity extends Activity {
 						nevent.setClickable(false);
 						nevent.setTextColor(0xffffffff);
 					} else {
+						// we are currently in the mode which shows a day set by
+						// the user
 						((TextView)mainActivity.this.findViewById(R.id.countdown)).setVisibility(View.GONE);
 						nevent.setTextColor(0xffcccccc);
 						nevent.setText(R.string.LANG_CLICKTOGETBACK);
@@ -296,13 +357,15 @@ public class mainActivity extends Activity {
 				// Activity is in foreground
 				if(mainActivity.saveFile.getLong("lastUpdate", 0) != mainActivity.last_news_update) // News have been updated
 					mainActivity.this.refreshNews();
+				// next update in 300ms (experiences show that this is the best
+				// rate)
 				Handler h = new Handler();
 				h.removeCallbacks(this);
 				h.postDelayed(this, 300);
 			}
 				
-				
-			preJSON = mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", "");
+			
+			//preJSON = mainActivity.saveFile.getString("newsJSON", "")+mainActivity.saveFile.getString("scheduleJSON", "");
 		}
 	}
 }

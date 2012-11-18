@@ -102,7 +102,44 @@
 					
 					</LinearLayout>
 					
-				  	
+				  	<LinearLayout
+				  	    android:id="@+id/spare_time_editor"
+					    android:layout_width="match_parent"
+					    android:layout_height="match_parent"
+					    android:orientation="vertical" >
+					        
+					    <TextView
+					        android:id="@+id/about_spare_time_editor"
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:text="@string/LANG_SPARETIMEEDITOR_TEXT"
+					        android:textAppearance="?android:attr/textAppearanceMedium" />
+					    
+					    <CheckBox
+					        android:id="@+id/spare_time_load_from_acl5m"
+					        android:layout_width="match_parent"
+					        android:layout_height="wrap_content"
+					        android:text="@string/LANG_SPARETIMELOADFROMACL5M"
+					        />
+					    
+					    <Button
+							    android:id="@+id/spare_time_add"
+							    style="?android:attr/buttonStyleSmall"
+							    android:layout_width="match_parent"
+							    android:layout_height="wrap_content"
+							    android:text="+" />
+						
+					    
+					    <LinearLayout
+						    android:id="@+id/spare_time_list"
+						    android:layout_width="match_parent"
+						    android:layout_height="wrap_content"
+						    android:orientation="vertical">
+				
+						</LinearLayout>
+					
+					</LinearLayout>
+					
 				  	<LinearLayout
 				  	    android:id="@+id/alarm_settings"
 					    android:layout_width="match_parent"

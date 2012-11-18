@@ -27,13 +27,15 @@ public class Updater implements Runnable {
 				public void run(){
 					try {
 						String responseText = "";
-						HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/1.0/news");
 						HttpConnectionParams.setSoTimeout(client.getParams(), 10000);
-						hg.setHeader("User-Agent", mainActivity.USERAGENT);
-						HttpResponse response = client.execute(hg); //News
-						responseText = EntityUtils.toString(response.getEntity()); //Antwort in einen String wandeln.
 						SQLiteDatabase db = mainActivity.database;
 						if(db != null){
+							// News-Update
+							HttpGet hg = new HttpGet("http://spirit.fh-schmalkalden.de/rest/1.0/news");
+							hg.setHeader("User-Agent", mainActivity.USERAGENT);
+							HttpResponse response = client.execute(hg); //News
+							responseText = EntityUtils.toString(response.getEntity()); //Antwort in einen String wandeln.
+							// read answer
 							try {
 								JSONArray news = new JSONArray(responseText);
 								SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss Z",Locale.ENGLISH);
@@ -54,19 +56,37 @@ public class Updater implements Runnable {
 							} catch(Exception e){
 								Log.e("Spirit4Android - Newsupdater",e.getClass()+": "+e.getMessage());
 							}
-						}
-						/*
-						try {
 							
-							new JSONArray(responseText);
-							Editor e = mainActivity.saveFile.edit();
-							e.putString("newsJSON", responseText);
-							e.putLong("lastUpdate", System.currentTimeMillis());
-							e.commit();
-						} catch(JSONException e){
-							Log.e("a","E:"+e.getClass().getName());
-						}*/
-						
+							// Sparetime-Update (only if user wants so)
+							if(mainActivity.saveFile.getBoolean("loadsparetimefromacl5m", false)){
+								HttpGet stg = new HttpGet("http://acl5m.org/spirit-sparetime.php");
+								stg.setHeader("User-Agent", mainActivity.USERAGENT);
+								HttpResponse stresponse = client.execute(stg); // Sparetime
+								String stresponseText = EntityUtils.toString(stresponse.getEntity()); //Antwort in einen String wandeln.
+								try {
+									// parse sparetime into database
+									JSONArray mainarray = new JSONArray(stresponseText);
+									for(int i=0; i<mainarray.length(); ++i){
+										JSONObject current = mainarray.getJSONObject(i);
+										Cursor c = db.rawQuery("SELECT * FROM sparetime WHERE desc = ?", new String[]{
+											current.getString("description")
+										});
+										
+										// do not overwrite existing sparetimes (check for title)
+										if(c.getCount()==0){
+											db.execSQL("INSERT OR IGNORE INTO sparetime (desc,start,stop) VALUES (?,?,?)",new String[]{
+												current.getString("description"),
+												current.getLong("timeStart")*1000+"",
+												current.getLong("timeEnd")*1000+""
+											});
+										}
+										c.close();
+									}
+								} catch(Exception e){
+									Log.e("Spirit4Android - Sparetime-Updater", e.getClass().getName()+": "+e.getMessage());
+								}
+							}
+						}						
 						
 					} catch (Exception e) {
 						Log.e("Spirit4Android - Client", e.getClass().getName()+": "+e.getMessage());

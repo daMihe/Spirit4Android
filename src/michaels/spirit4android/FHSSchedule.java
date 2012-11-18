@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.json.JSONArray;
@@ -62,6 +63,9 @@ public class FHSSchedule {
 	}
 	
 	public Event[] getEventsAtDay(Calendar day){
+		/*
+		 * generates the schedule for the user at the given day.
+		 */
 		long start = day.get(Calendar.DAY_OF_WEEK)*24*60*60;
 		
 		ArrayList<Event> rtn = new ArrayList<Event>();
@@ -69,6 +73,7 @@ public class FHSSchedule {
 		c.moveToFirst();
 		while(!c.isAfterLast()){
 			boolean add = true;
+			// if the user is not in the group for this event don't add the event to the days schedule
 			if(c.getInt(c.getColumnIndex("egroup")) > 0){
 				Cursor d = db.rawQuery("SELECT egroup FROM groups WHERE type = "+c.getInt(c.getColumnIndex("type"))+" AND title = '"+c.getString(c.getColumnIndex("title"))+"'",null);
 				d.moveToFirst();
@@ -87,7 +92,23 @@ public class FHSSchedule {
 				ev.title = c.getString(c.getColumnIndex("title"));
 				ev.type = (byte) c.getInt(c.getColumnIndex("type"));
 				ev.week = (byte) c.getInt(c.getColumnIndex("week"));
-				rtn.add(ev);
+				
+				// if the event is in a sparetime, don't add it to the schedule
+				// to check this, we have to get the Millis from 1970-01-01.
+				Calendar today = (Calendar) day.clone();
+				today.set(Calendar.HOUR_OF_DAY,0);
+				today.set(Calendar.MINUTE,0);
+				today.set(Calendar.SECOND,0);
+				long starttime = getCalendar(ev,true,today).getTimeInMillis();
+				// now we search in the database.
+				Cursor d = db.rawQuery("SELECT * FROM sparetime WHERE start < "+
+						starttime+" AND stop > "+starttime, null);
+				
+				// found something? Event is lying in a sparetime.
+				if(d.getCount() == 0)
+					rtn.add(ev);
+				
+				d.close();
 			}
 			c.moveToNext();
 		}
@@ -164,11 +185,11 @@ public class FHSSchedule {
 		return getNextEvent();
 	}
 	
-	public Calendar getCalendar(Event jso, boolean current){
+	public Calendar getCalendar(Event jso, boolean current, Calendar base){
 		if(jso == null){
 			throw new NullPointerException();
 		}
-		Calendar rtn = Calendar.getInstance();
+		Calendar rtn = (Calendar) base.clone();
 		rtn.add(Calendar.DAY_OF_YEAR, -rtn.get(Calendar.DAY_OF_WEEK));
 		rtn.set(Calendar.HOUR_OF_DAY, 0);
 		rtn.set(Calendar.MINUTE, 0);
@@ -183,6 +204,10 @@ public class FHSSchedule {
 		if(((rtn.get(Calendar.WEEK_OF_YEAR)%2+1)&jso.week) == 0)
 			rtn.add(Calendar.DAY_OF_YEAR,7);
 		return rtn;
+	}
+	
+	public Calendar getCalendar(Event jso, boolean current){
+		return getCalendar(jso,current,Calendar.getInstance());
 	}
 	
 	public Calendar getNextCalendar(Event e){

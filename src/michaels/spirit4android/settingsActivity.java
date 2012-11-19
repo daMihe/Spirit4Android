@@ -18,10 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -51,7 +51,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class settingsActivity extends Activity {
+public class settingsActivity extends TabActivity {
 	
 	HashMap<String,Integer> groups = new HashMap<String,Integer>();
 	DefaultHttpClient client = new DefaultHttpClient();
@@ -67,7 +67,7 @@ public class settingsActivity extends Activity {
 		this.setContentView(R.layout.settings);
 		
 		//initialize Tabs
-		TabHost th = (TabHost) this.findViewById(R.id.settings_tabhost);
+		TabHost th = (TabHost) this.findViewById(android.R.id.tabhost);
 		th.setup();
 		
 		TabSpec tab_simple = th.newTabSpec("tab1");

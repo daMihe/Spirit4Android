@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:minLines="2"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:textAppearance="?android:attr/textAppearanceMedium">
     
 </TextView>

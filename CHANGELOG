@@ -1,5 +1,6 @@
 Changelog for Spirit4Android
 
+<<<<<<< HEAD
 Planned Features
 - More Display-Settings
 
@@ -12,6 +13,11 @@ Version 0.8 Landry (not released yet)
   view. This bug existed only on devices running Android 4.x
 - Feature added: sparetime (events in sparetime will be ignored)
 - Bug fixed (was only present in build 470): News will now open again.
+=======
+Planned for future (priority from top to bottom)
+- Add Homescreen-Widget
+- Add Spare-Time
+>>>>>>> refs/remotes/origin/master
 
 Version 0.7 Hammond
 - Fixed Bug: Alarm is now starting at right time. (maybe this bug existed only 

@@ -1,9 +1,12 @@
 Changelog for Spirit4Android
 
+Spirit4Android reached it's end of life. It wont be supported, but you can use
+it if you want. The App itself works and is relative stable.
+
 Planned Features
 - More Display-Settings
 
-Version 0.8 Landry (not released yet)
+Version 0.8 Landry
 - Feature added: Homescreen-Widget
 - UI changed: new option to shorten the words "lecture" and "exercise" (in ger-
   man too)
